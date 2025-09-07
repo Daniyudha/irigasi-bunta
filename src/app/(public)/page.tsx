@@ -106,14 +106,14 @@ export default function Home() {
       <section className="py-16 bg-blue-600 text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-6">
-            Siap Mengoptimalkan Irigasi Anda?
+            Ada Keluhan Dengan Jaringan Irigasi di Bunta?
           </h2>
           <p className="text-xl mb-8 max-w-2xl mx-auto">
-            Bergabunglah dengan ratusan petani yang mempercayai Bunta untuk manajemen irigasi dan dukungan yang andal.
+            Diskusikan dengan kami untuk mendapatkan pelayanan yang baik dan andal.
           </p>
-          <button className="bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors">
+          <a href="http://wa.me/6289696862326" target="_blank" className="bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-green-400 hover:text-white cursor-pointer transition duration-300">
             Mulai Sekarang
-          </button>
+          </a>
         </div>
       </section>
     </div>
