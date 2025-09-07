@@ -17,17 +17,17 @@ export default function Home() {
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <h1 className="text-4xl md:text-6xl font-bold mb-6">
-              Bunta  Irrigation System
+              Sistem Irigasi Bunta
             </h1>
             <p className="text-xl md:text-2xl mb-8 max-w-3xl mx-auto">
-              Comprehensive water management and irrigation information for farmers and stakeholders in the Bunta region.
+              Informasi lengkap manajemen air dan irigasi untuk petani dan pemangku kepentingan di wilayah Bunta.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <button className="bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors">
-                View Water Levels
+                Lihat Level Air
               </button>
               <button className="border-2 border-white text-white px-8 py-3 rounded-lg font-semibold hover:bg-white hover:text-blue-600 transition-colors">
-                Learn More
+                Pelajari Lebih Lanjut
               </button>
             </div>
           </div>
@@ -39,7 +39,7 @@ export default function Home() {
       <section className="py-16 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 text-gray-800">
-            Our Services
+            Layanan Kami
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {/* Feature 1 */}
@@ -47,9 +47,9 @@ export default function Home() {
               <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <span className="text-2xl">💧</span>
               </div>
-              <h3 className="text-xl font-semibold text-black mb-3">Water Level Monitoring</h3>
+              <h3 className="text-xl font-semibold text-black mb-3">Pemantauan Level Air</h3>
               <p className="text-gray-600">
-                Real-time monitoring of water levels across irrigation channels with historical data analysis.
+                Pemantauan real-time level air di saluran irigasi dengan analisis data historis.
               </p>
             </div>
 
@@ -58,9 +58,9 @@ export default function Home() {
               <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <span className="text-2xl">📊</span>
               </div>
-              <h3 className="text-xl font-semibold text-black mb-3">Data Analytics</h3>
+              <h3 className="text-xl font-semibold text-black mb-3">Analisis Data</h3>
               <p className="text-gray-600">
-                Comprehensive data analysis and visualization for informed decision making in water management.
+                Analisis data komprehensif dan visualisasi untuk pengambilan keputusan yang tepat dalam manajemen air.
               </p>
             </div>
 
@@ -69,9 +69,9 @@ export default function Home() {
               <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <span className="text-2xl">🌾</span>
               </div>
-              <h3 className="text-xl font-semibold text-black mb-3">Farmer Support</h3>
+              <h3 className="text-xl font-semibold text-black mb-3">Dukungan Petani</h3>
               <p className="text-gray-600">
-                Dedicated support and resources for farmers to optimize irrigation and improve crop yields.
+                Dukungan dan sumber daya khusus untuk petani dalam mengoptimalkan irigasi dan meningkatkan hasil panen.
               </p>
             </div>
           </div>
@@ -84,19 +84,19 @@ export default function Home() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
             <div>
               <div className="text-3xl md:text-4xl font-bold text-blue-600 mb-2">250+</div>
-              <div className="text-gray-600">Farmers Served</div>
+              <div className="text-gray-600">Petani Dilayani</div>
             </div>
             <div>
               <div className="text-3xl md:text-4xl font-bold text-green-600 mb-2">1,200+</div>
-              <div className="text-gray-600">Hectares Covered</div>
+              <div className="text-gray-600">Hektar Tercover</div>
             </div>
             <div>
               <div className="text-3xl md:text-4xl font-bold text-orange-600 mb-2">24/7</div>
-              <div className="text-gray-600">Monitoring</div>
+              <div className="text-gray-600">Pemantauan</div>
             </div>
             <div>
               <div className="text-3xl md:text-4xl font-bold text-purple-600 mb-2">15+</div>
-              <div className="text-gray-600">Years Experience</div>
+              <div className="text-gray-600">Tahun Pengalaman</div>
             </div>
           </div>
         </div>
@@ -106,13 +106,13 @@ export default function Home() {
       <section className="py-16 bg-blue-600 text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-6">
-            Ready to Optimize Your Irrigation?
+            Siap Mengoptimalkan Irigasi Anda?
           </h2>
           <p className="text-xl mb-8 max-w-2xl mx-auto">
-            Join hundreds of farmers who trust Bunta  for reliable irrigation management and support.
+            Bergabunglah dengan ratusan petani yang mempercayai Bunta untuk manajemen irigasi dan dukungan yang andal.
           </p>
           <button className="bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors">
-            Get Started Today
+            Mulai Sekarang
           </button>
         </div>
       </section>

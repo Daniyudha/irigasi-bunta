@@ -25,12 +25,12 @@ export default function LoginPage() {
       });
 
       if (result?.error) {
-        setError('Invalid email or password');
+        setError('Email atau kata sandi tidak valid');
       } else {
         router.push('/admin/dashboard');
       }
     } catch {
-      setError('An error occurred. Please try again.');
+      setError('Terjadi kesalahan. Silakan coba lagi.');
     } finally {
       setIsLoading(false);
     }
@@ -41,10 +41,10 @@ export default function LoginPage() {
       <div className="max-w-md w-full space-y-8">
         <div>
           <div className="text-center">
-            <h1 className="text-4xl font-bold text-blue-600 mb-2">Bunta Bella</h1>
+            <h1 className="text-4xl font-bold text-blue-600 mb-2">Bunta</h1>
             <h2 className="text-2xl font-semibold text-gray-900">Irrigation System</h2>
             <p className="mt-2 text-sm text-gray-600">
-              Sign in to access your account
+              Masuk untuk mengakses akun Anda
             </p>
           </div>
         </div>
@@ -59,7 +59,7 @@ export default function LoginPage() {
           <div className="space-y-4">
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                Email Address
+                Alamat Email
               </label>
               <input
                 id="email"
@@ -69,13 +69,13 @@ export default function LoginPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="mt-1 block w-full px-3 py-2 text-black border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                placeholder="Enter your email"
+                placeholder="Masukkan email Anda"
               />
             </div>
             
             <div>
               <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-                Password
+                Kata Sandi
               </label>
               <input
                 id="password"
@@ -85,7 +85,7 @@ export default function LoginPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="mt-1 block w-full px-3 py-2 text-black border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                placeholder="Enter your password"
+                placeholder="Masukkan kata sandi Anda"
               />
             </div>
           </div>
@@ -102,10 +102,10 @@ export default function LoginPage() {
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                   </svg>
-                  Signing in...
+                  Sedang masuk...
                 </>
               ) : (
-                'Sign in'
+                'Masuk'
               )}
             </button>
           </div>
@@ -115,17 +115,17 @@ export default function LoginPage() {
               href="/" 
               className="text-sm text-blue-600 hover:text-blue-500"
             >
-              ← Back to main site
+              ← Kembali ke situs utama
             </Link>
           </div>
         </form>
 
         <div className="mt-6 text-center">
           <div className="bg-gray-100 p-4 rounded-lg">
-            <h3 className="text-sm font-medium text-gray-900 mb-2">Demo Credentials</h3>
+            <h3 className="text-sm font-medium text-gray-900 mb-2">Kredensial Demo</h3>
             <p className="text-xs text-gray-600">
               Email: admin@buntabella.go.id<br />
-              Password: admin123
+              Kata Sandi: admin123
             </p>
           </div>
         </div>

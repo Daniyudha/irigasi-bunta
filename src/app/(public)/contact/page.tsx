@@ -14,6 +14,9 @@ export default function ContactPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
 
+  // Google Maps embed URL
+  const mapsEmbedUrl = `https://www.google.com/maps/embed?pb=!1m17!1m12!1m3!1d956.4111068714739!2d122.21546773010013!3d-0.8689575518802887!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m2!1m1!2zMMKwNTInMDguNyJTIDEyMsKwMTInNTcuNCJF!5e0!3m2!1sen!2sid!4v1757283599798!5m2!1sen!2sid"`;
+
   const {
     register,
     handleSubmit,
@@ -57,62 +60,62 @@ export default function ContactPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header Section */}
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-gray-800 mb-4">Contact Us</h1>
+          <h1 className="text-4xl font-bold text-gray-800 mb-4">Hubungi Kami</h1>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Get in touch with the Bunta–Bella Irrigation Monitoring Office for inquiries, support, or feedback.
+            Hubungi Kantor Pemantauan Irigasi Bunta untuk pertanyaan, dukungan, atau masukan.
           </p>
         </div>
 
         {/* Status Messages */}
         {submitStatus === 'success' && (
           <div className="mb-6 p-4 bg-green-100 border border-green-400 text-green-700 rounded-lg">
-            Thank you for your message! We will get back to you soon.
+            Terima kasih atas pesan Anda! Kami akan segera menghubungi Anda kembali.
           </div>
         )}
         
         {submitStatus === 'error' && (
           <div className="mb-6 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg">
-            There was an error sending your message. Please try again or contact us directly.
+            Terjadi kesalahan saat mengirim pesan Anda. Silakan coba lagi atau hubungi kami langsung.
           </div>
         )}
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
           {/* Contact Information */}
           <div>
-            <h2 className="text-2xl font-semibold mb-6 text-gray-800">Office Information</h2>
+            <h2 className="text-2xl font-semibold mb-6 text-gray-800">Informasi Kantor</h2>
             
             <div className="space-y-6">
               <div>
-                <h3 className="text-lg font-semibold mb-2 text-blue-600">Address</h3>
+                <h3 className="text-lg font-semibold mb-2 text-blue-600">Alamat</h3>
                 <p className="text-gray-600">
-                  Jl. Raya Bunta–Bella No. 123<br />
-                  Bunta District, Central Sulawesi<br />
-                  Indonesia 94563
+                  Gonohop, Simpang Raya, <br />
+                  Kabupaten Banggai, Sulawesi Tengah <br />
+                  Indonesia 
                 </p>
               </div>
 
               <div>
-                <h3 className="text-lg font-semibold mb-2 text-blue-600">Contact Details</h3>
+                <h3 className="text-lg font-semibold mb-2 text-blue-600">Detail Kontak</h3>
                 <p className="text-gray-600">
-                  <strong>Phone:</strong> +62 812-3456-7890<br />
-                  <strong>Email:</strong> info@buntabella-irrigation.go.id<br />
-                  <strong>Hours:</strong> Mon-Fri, 8:00 AM - 4:00 PM
+                  <strong>Telepon:</strong> +62 896-9686-2326<br />
+                  <strong>Email:</strong> irigasibunta@gmail.com<br />
+                  <strong>Jam Kerja:</strong> Senin-Jumat, 08:00 - 16:00
                 </p>
               </div>
 
               <div>
-                <h3 className="text-lg font-semibold mb-2 text-blue-600">Emergency Contact</h3>
+                <h3 className="text-lg font-semibold mb-2 text-blue-600">Kontak Darurat</h3>
                 <p className="text-gray-600">
-                  For urgent irrigation-related issues outside office hours, please contact our emergency line: +62 813-9999-8888
+                  Untuk masalah irigasi mendesak di luar jam kerja, silakan hubungi saluran darurat kami: irigasibunta@gmail.com
                 </p>
               </div>
 
               <div>
-                <h3 className="text-lg font-semibold mb-2 text-blue-600">Departments</h3>
+                <h3 className="text-lg font-semibold mb-2 text-blue-600">Departemen</h3>
                 <p className="text-gray-600">
-                  <strong>Technical Support:</strong> tech@buntabella-irrigation.go.id<br />
-                  <strong>Farmer Relations:</strong> farmers@buntabella-irrigation.go.id<br />
-                  <strong>Data Inquiries:</strong> data@buntabella-irrigation.go.id
+                  <strong>Dukungan Teknis:</strong> Untung<br />
+                  <strong>Hubungan Petani:</strong> Karyono (Gapuktan) & Supriyono(GP3A)<br />
+                  <strong>Pertanyaan Data:</strong> Ahmad Fauzi Ridwan, A.Md.
                 </p>
               </div>
             </div>
@@ -120,27 +123,27 @@ export default function ContactPage() {
 
           {/* Contact Form */}
           <div>
-            <h2 className="text-2xl font-semibold mb-6 text-gray-800">Send us a Message</h2>
+            <h2 className="text-2xl font-semibold mb-6 text-gray-800">Kirim Pesan kepada Kami</h2>
             
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
               <div>
                 <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
-                  Full Name *
+                  Nama Lengkap *
                 </label>
                 <input
                   type="text"
                   id="name"
                   {...register('name', { 
-                    required: 'Name is required',
+                    required: 'Nama wajib diisi',
                     minLength: {
                       value: 2,
-                      message: 'Name must be at least 2 characters'
+                      message: 'Nama minimal 2 karakter'
                     }
                   })}
-                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                  className={`w-full px-4 py-3 text-black border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
                     errors.name ? 'border-red-300' : 'border-gray-300'
                   }`}
-                  placeholder="Enter your full name"
+                  placeholder="Masukkan nama lengkap Anda"
                 />
                 {errors.name && (
                   <p className="mt-1 text-sm text-red-600">{errors.name.message}</p>
@@ -149,22 +152,22 @@ export default function ContactPage() {
 
               <div>
                 <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-                  Email Address *
+                  Alamat Email *
                 </label>
                 <input
                   type="email"
                   id="email"
                   {...register('email', { 
-                    required: 'Email is required',
+                    required: 'Email wajib diisi',
                     pattern: {
                       value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                      message: 'Invalid email address'
+                      message: 'Alamat email tidak valid'
                     }
                   })}
-                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                  className={`w-full px-4 py-3 text-black border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
                     errors.email ? 'border-red-300' : 'border-gray-300'
                   }`}
-                  placeholder="Enter your email address"
+                  placeholder="Masukkan alamat email Anda"
                 />
                 {errors.email && (
                   <p className="mt-1 text-sm text-red-600">{errors.email.message}</p>
@@ -173,22 +176,22 @@ export default function ContactPage() {
 
               <div>
                 <label htmlFor="subject" className="block text-sm font-medium text-gray-700 mb-2">
-                  Subject *
+                  Subjek *
                 </label>
                 <input
                   type="text"
                   id="subject"
                   {...register('subject', { 
-                    required: 'Subject is required',
+                    required: 'Subjek wajib diisi',
                     minLength: {
                       value: 5,
-                      message: 'Subject must be at least 5 characters'
+                      message: 'Subjek minimal 5 karakter'
                     }
                   })}
-                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                  className={`w-full px-4 py-3 text-black border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
                     errors.subject ? 'border-red-300' : 'border-gray-300'
                   }`}
-                  placeholder="Enter the subject of your message"
+                  placeholder="Masukkan subjek pesan Anda"
                 />
                 {errors.subject && (
                   <p className="mt-1 text-sm text-red-600">{errors.subject.message}</p>
@@ -197,22 +200,22 @@ export default function ContactPage() {
 
               <div>
                 <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-2">
-                  Message *
+                  Pesan *
                 </label>
                 <textarea
                   id="message"
                   rows={5}
                   {...register('message', { 
-                    required: 'Message is required',
+                    required: 'Pesan wajib diisi',
                     minLength: {
                       value: 10,
-                      message: 'Message must be at least 10 characters'
+                      message: 'Pesan minimal 10 karakter'
                     }
                   })}
-                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                  className={`w-full px-4 py-3 text-black border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
                     errors.message ? 'border-red-300' : 'border-gray-300'
                   }`}
-                  placeholder="Enter your message here..."
+                  placeholder="Masukkan pesan Anda di sini..."
                 />
                 {errors.message && (
                   <p className="mt-1 text-sm text-red-600">{errors.message.message}</p>
@@ -230,33 +233,38 @@ export default function ContactPage() {
                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                     </svg>
-                    Sending...
+                    Mengirim...
                   </>
                 ) : (
-                  'Send Message'
+                  'Kirim Pesan'
                 )}
               </button>
             </form>
           </div>
         </div>
 
-        {/* Map Placeholder */}
+        {/* Map Section */}
         <div className="mt-16">
-          <h2 className="text-2xl font-semibold mb-6 text-gray-800 text-center">Our Location</h2>
+          <h2 className="text-2xl font-semibold mb-6 text-gray-800 text-center">Lokasi Kami</h2>
           <div className="bg-white rounded-lg shadow-lg p-6">
-            <div className="bg-gray-200 h-64 rounded-lg flex items-center justify-center">
-              <div className="text-center">
-                <div className="text-4xl mb-2">🗺️</div>
-                <p className="text-gray-500">Interactive Map Coming Soon</p>
-                <p className="text-sm text-gray-400 mt-1">Google Maps/Leaflet Integration</p>
-              </div>
+            <div className="w-full h-96 rounded-lg overflow-hidden">
+              <iframe
+                src={mapsEmbedUrl}
+                width="100%"
+                height="100%"
+                style={{ border: 0 }}
+                allowFullScreen
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+                title="Lokasi Kantor Pemantauan Irigasi Bunta"
+              />
             </div>
             <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-600">
               <div>
-                <strong>Coordinates:</strong> -1.3891° N, 121.6139° E
+                <strong>Koordinat:</strong> -1.3891° N, 121.6139° E
               </div>
               <div>
-                <strong>Access:</strong> Accessible via main road from Bunta city center
+                <strong>Akses:</strong> Dapat diakses melalui jalan utama dari pusat kota Bunta
               </div>
             </div>
           </div>

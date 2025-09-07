@@ -3,6 +3,7 @@
 import { ReactNode, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { signOut } from 'next-auth/react';
 import {
   LayoutDashboard,
   FileText,
@@ -38,9 +39,9 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
           <div className="flex items-center justify-center h-16 px-4 bg-gray-900 border-b border-gray-800">
             <div className="flex items-center space-x-2">
               <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-lg">BB</span>
+                <span className="text-white font-bold text-lg">B</span>
               </div>
-              <span className="text-xl font-bold">Bunta Bella</span>
+              <span className="text-xl font-bold">Bunta</span>
             </div>
           </div>
           
@@ -48,7 +49,9 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
             <nav className="mt-8 px-4 space-y-2">
               {adminNavigation.map((item) => {
                 const Icon = item.icon;
-                const isActive = pathname === item.href;
+                // Check if current path matches exactly or starts with the href for items with sub-pages
+                const isActive = pathname === item.href ||
+                                (item.href !== '/admin/dashboard' && pathname.startsWith(item.href));
                 
                 return (
                   <Link
@@ -70,7 +73,10 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
             </nav>
 
             <div className="mt-auto p-4 border-t border-gray-800">
-              <button className="flex items-center space-x-3 px-4 py-3 text-gray-300 hover:bg-gray-800 hover:text-white rounded-lg w-full transition-colors">
+              <button
+                onClick={() => signOut({ callbackUrl: '/' })}
+                className="flex items-center space-x-3 px-4 py-3 text-gray-300 hover:bg-gray-800 hover:text-white rounded-lg w-full transition-colors"
+              >
                 <LogOut size={20} />
                 <span>Logout</span>
               </button>
@@ -104,7 +110,9 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
           <nav className="space-y-2">
             {adminNavigation.map((item) => {
               const Icon = item.icon;
-              const isActive = pathname === item.href;
+              // Check if current path matches exactly or starts with the href for items with sub-pages
+              const isActive = pathname === item.href ||
+                              (item.href !== '/admin/dashboard' && pathname.startsWith(item.href));
               
               return (
                 <Link
@@ -127,7 +135,10 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
           </nav>
 
           <div className="mt-8 pt-8 border-t border-gray-800">
-            <button className="flex items-center space-x-3 px-4 py-3 text-gray-300 hover:bg-gray-800 hover:text-white rounded-lg w-full transition-colors">
+            <button
+              onClick={() => signOut({ callbackUrl: '/' })}
+              className="flex items-center space-x-3 px-4 py-3 text-gray-300 hover:bg-gray-800 hover:text-white rounded-lg w-full transition-colors"
+            >
               <LogOut size={20} />
               <span>Logout</span>
             </button>

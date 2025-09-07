@@ -20,7 +20,7 @@ interface DynamicMapProps {
 }
 
 export default function DynamicMap({ areas, onAreaSelect }: DynamicMapProps) {
-  const center: [number, number] = [-1.423, 121.646]; // Center between Bunta and Bella
+  const center: [number, number] = [-1.423, 121.646]; // Center between Bunta and Bunta
 
   const getStatusColor = (status: IrrigationArea['status']) => {
     switch (status) {
@@ -71,9 +71,9 @@ export default function DynamicMap({ areas, onAreaSelect }: DynamicMapProps) {
                     <span className={`w-3 h-3 rounded-full ${getStatusColor(area.status)}`}></span>
                     <span className="text-sm font-medium">{getStatusText(area.status)}</span>
                   </div>
-                  <p className="text-sm">Water Level: <strong>{area.waterLevel}m</strong></p>
+                  <p className="text-sm">Water Level: <strong>{area.waterLevel}</strong></p>
                   <p className="text-sm">Area: <strong>{area.area.toLocaleString()} ha</strong></p>
-                  <p className="text-sm">Canals: <strong>{area.canals}</strong></p>
+                  <p className="text-sm">Canals: <strong>{area.canals} km</strong></p>
                   <p className="text-sm">Gates: <strong>{area.gates}</strong></p>
                   <p className="text-xs text-gray-500">
                     Last updated: {new Date(area.lastUpdate).toLocaleString()}

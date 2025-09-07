@@ -43,12 +43,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const slug = name
-      .toLowerCase()
-      .replace(/[^a-z0-9 -]/g, '')
-      .replace(/\s+/g, '-')
-      .replace(/-+/g, '-')
-      .trim();
+    // Generate slug from name
+    const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
 
     // Check if category already exists
     const existingCategory = await prisma.category.findUnique({

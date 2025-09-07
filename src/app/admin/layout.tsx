@@ -10,6 +10,6 @@ export default function AdminRootLayout({ children }: AdminRootLayoutProps) {
 }
 
 export const metadata = {
-  title: 'Admin Panel - Bunta Bella Irrigation',
-  description: 'Administration dashboard for Bunta Bella Irrigation System',
+  title: 'Panel Admin - Irigasi Bunta Bunta',
+  description: 'Dashboard administrasi untuk Sistem Irigasi Bunta Bunta',
 };

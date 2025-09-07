@@ -9,10 +9,10 @@ export default function DataPage() {
   const [activeTab, setActiveTab] = useState('water');
 
   const tabs = [
-    { id: 'water', label: 'Water Levels', icon: '💧' },
-    { id: 'rainfall', label: 'Rainfall', icon: '🌧️' },
-    { id: 'crops', label: 'Crop Data', icon: '🌾' },
-    { id: 'farmers', label: 'Farmer Stats', icon: '👨‍🌾' },
+    { id: 'water', label: 'Level Air', icon: '💧' },
+    { id: 'rainfall', label: 'Curah Hujan', icon: '🌧️' },
+    { id: 'crops', label: 'Data Tanaman', icon: '🌾' },
+    { id: 'farmers', label: 'Statistik Petani', icon: '👨‍🌾' },
   ];
 
   const renderTabContent = () => {
@@ -24,15 +24,15 @@ export default function DataPage() {
       case 'crops':
         return (
           <div className="w-full">
-            <h3 className="text-lg font-semibold text-black mb-4 text-center">Crop Production Data (Wet Season 2025)</h3>
+            <h3 className="text-lg font-semibold text-black mb-4 text-center">Data Produksi Tanaman (Musim Hujan 2025)</h3>
             <div className="overflow-x-auto">
               <table className="min-w-full bg-white border border-gray-200">
                 <thead>
                   <tr className="bg-gray-50 text-black">
-                    <th className="px-4 py-2 text-left font-semibold">Crop</th>
+                    <th className="px-4 py-2 text-left font-semibold">Tanaman</th>
                     <th className="px-4 py-2 text-left font-semibold">Area (ha)</th>
-                    <th className="px-4 py-2 text-left font-semibold">Production (tons)</th>
-                    <th className="px-4 py-2 text-left font-semibold">Yield (tons/ha)</th>
+                    <th className="px-4 py-2 text-left font-semibold">Produksi (ton)</th>
+                    <th className="px-4 py-2 text-left font-semibold">Hasil (ton/ha)</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -52,15 +52,15 @@ export default function DataPage() {
       case 'farmers':
         return (
           <div className="w-full">
-            <h3 className="text-lg font-semibold text-black mb-4 text-center">Farmer Statistics by District</h3>
+            <h3 className="text-lg font-semibold text-black mb-4 text-center">Statistik Petani per Kecamatan</h3>
             <div className="overflow-x-auto">
               <table className="min-w-full bg-white border border-gray-200">
                 <thead>
                   <tr className="bg-gray-50 text-black">
-                    <th className="px-4 py-2 text-left font-semibold">District</th>
-                    <th className="px-4 py-2 text-left font-semibold">Farmers</th>
+                    <th className="px-4 py-2 text-left font-semibold">Kecamatan</th>
+                    <th className="px-4 py-2 text-left font-semibold">Petani</th>
                     <th className="px-4 py-2 text-left font-semibold">Area (ha)</th>
-                    <th className="px-4 py-2 text-left font-semibold">Avg Yield (tons/ha)</th>
+                    <th className="px-4 py-2 text-left font-semibold">Rata-rata Hasil (ton/ha)</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -87,9 +87,9 @@ export default function DataPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header Section */}
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-gray-800 mb-4">Data & Statistics</h1>
+          <h1 className="text-4xl font-bold text-gray-800 mb-4">Data & Statistik</h1>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Access comprehensive irrigation data, water levels, rainfall statistics, and agricultural production metrics.
+            Akses data irigasi komprehensif, level air, statistik curah hujan, dan metrik produksi pertanian.
           </p>
         </div>
 
@@ -99,38 +99,38 @@ export default function DataPage() {
             <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <span className="text-xl">💧</span>
             </div>
-            <h3 className="text-lg font-semibold text-black mb-2">Water Levels</h3>
-            <p className="text-gray-600 text-sm">Real-time and historical water level data</p>
+            <h3 className="text-lg font-semibold text-black mb-2">Level Air</h3>
+            <p className="text-gray-600 text-sm">Data level air real-time dan historis</p>
           </div>
 
           <div className="bg-white p-6 rounded-lg shadow-md text-center">
             <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <span className="text-xl">🌧️</span>
             </div>
-            <h3 className="text-lg font-semibold text-black mb-2">Rainfall</h3>
-            <p className="text-gray-600 text-sm">Daily and seasonal rainfall statistics</p>
+            <h3 className="text-lg font-semibold text-black mb-2">Curah Hujan</h3>
+            <p className="text-gray-600 text-sm">Statistik curah hujan harian dan musiman</p>
           </div>
 
           <div className="bg-white p-6 rounded-lg shadow-md text-center">
             <div className="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <span className="text-xl">🌾</span>
             </div>
-            <h3 className="text-lg font-semibold text-black mb-2">Planted Area</h3>
-            <p className="text-gray-600 text-sm">Crop planting data and area coverage</p>
+            <h3 className="text-lg font-semibold text-black mb-2">Area Tanam</h3>
+            <p className="text-gray-600 text-sm">Data penanaman tanaman dan cakupan area</p>
           </div>
 
           <div className="bg-white p-6 rounded-lg shadow-md text-center">
             <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <span className="text-xl">📊</span>
             </div>
-            <h3 className="text-lg font-semibold text-black mb-2">Production</h3>
-            <p className="text-gray-600 text-sm">Agricultural production statistics</p>
+            <h3 className="text-lg font-semibold text-black mb-2">Produksi</h3>
+            <p className="text-gray-600 text-sm">Statistik produksi pertanian</p>
           </div>
         </div>
 
         {/* Data Visualization Section */}
         <div className="bg-white rounded-lg shadow-lg p-8 mb-8">
-          <h2 className="text-2xl font-semibold mb-6 text-gray-800">Data Visualization</h2>
+          <h2 className="text-2xl font-semibold mb-6 text-gray-800">Visualisasi Data</h2>
           
           {/* Tab Navigation */}
           <div className="flex flex-wrap border-b border-gray-200 mb-6">
@@ -158,15 +158,15 @@ export default function DataPage() {
 
         {/* Features Information */}
         <div className="bg-blue-50 rounded-lg p-8">
-          <h2 className="text-2xl font-semibold mb-4 text-blue-800">Available Features</h2>
+          <h2 className="text-2xl font-semibold mb-4 text-blue-800">Fitur yang Tersedia</h2>
           <ul className="list-disc list-inside text-gray-700 space-y-2">
-            <li>Interactive time series charts for water levels and rainfall</li>
-            <li>Real-time data updates (simulated for demonstration)</li>
-            <li>Historical data analysis and trends</li>
-            <li>Crop production statistics</li>
-            <li>Farmer data and statistics</li>
-            <li>Agricultural production reports</li>
-            <li>Responsive design for mobile and desktop</li>
+            <li>Bagan time series interaktif untuk level air dan curah hujan</li>
+            <li>Pembaruan data real-time (disimulasikan untuk demonstrasi)</li>
+            <li>Analisis data historis dan tren</li>
+            <li>Statistik produksi tanaman</li>
+            <li>Data dan statistik petani</li>
+            <li>Laporan produksi pertanian</li>
+            <li>Desain responsif untuk mobile dan desktop</li>
           </ul>
         </div>
       </div>

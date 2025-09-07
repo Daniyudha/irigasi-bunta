@@ -16,7 +16,7 @@ export default function WaterLevelChart({ data }: WaterLevelChartProps) {
 
   return (
     <div className="w-full h-80">
-      <h3 className="text-lg font-semibold text-black mb-4 text-center">Water Level Trends (meters)</h3>
+      <h3 className="text-lg font-semibold text-black mb-4 text-center">Tren Ketinggian Air (meter)</h3>
       <ResponsiveContainer width="100%" height="100%">
         <LineChart
           data={chartData}
@@ -33,7 +33,6 @@ export default function WaterLevelChart({ data }: WaterLevelChartProps) {
           <Tooltip />
           <Legend />
           <Line type="monotone" dataKey="Bunta" stroke="#3b82f6" strokeWidth={2} activeDot={{ r: 8 }} />
-          <Line type="monotone" dataKey="Bella" stroke="#10b981" strokeWidth={2} />
         </LineChart>
       </ResponsiveContainer>
     </div>

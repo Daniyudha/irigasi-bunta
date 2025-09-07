@@ -7,6 +7,7 @@ import { galleryItems, galleryCategories, GalleryCategory } from '@/types/galler
 export default function GalleryPage() {
   const [selectedCategory, setSelectedCategory] = useState<GalleryCategory>('All');
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [selectedImageType, setSelectedImageType] = useState<'image' | 'video'>('image');
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
 
   // Filter items based on category
@@ -16,8 +17,9 @@ export default function GalleryPage() {
       : galleryItems.filter(item => item.category === selectedCategory);
   }, [selectedCategory]);
 
-  const handleImageClick = (imageUrl: string) => {
+  const handleImageClick = (imageUrl: string, type: 'image' | 'video') => {
     setSelectedImage(imageUrl);
+    setSelectedImageType(type);
     setIsLightboxOpen(true);
   };
 
@@ -32,7 +34,7 @@ export default function GalleryPage() {
   };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
+    return new Date(dateString).toLocaleDateString('id-ID', {
       year: 'numeric',
       month: 'long',
       day: 'numeric'
@@ -44,9 +46,9 @@ export default function GalleryPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header Section */}
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-gray-800 mb-4">Gallery</h1>
+          <h1 className="text-4xl font-bold text-gray-800 mb-4">Galeri</h1>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Explore our collection of photos showcasing irrigation activities, infrastructure, and community events.
+            Jelajahi koleksi foto kami yang menampilkan kegiatan irigasi, infrastruktur, dan acara komunitas.
           </p>
         </div>
 
@@ -72,8 +74,8 @@ export default function GalleryPage() {
         {/* Results Count */}
         <div className="mb-6 text-center">
           <p className="text-gray-600">
-            Showing {filteredItems.length} item{filteredItems.length !== 1 ? 's' : ''}
-            {selectedCategory !== 'All' && ` in ${selectedCategory}`}
+            Menampilkan {filteredItems.length} item{filteredItems.length !== 1 ? '' : ''}
+            {selectedCategory !== 'All' && ` dalam ${selectedCategory}`}
           </p>
         </div>
 
@@ -84,19 +86,37 @@ export default function GalleryPage() {
               <div
                 key={item.id}
                 className="bg-white rounded-lg shadow-md overflow-hidden group cursor-pointer hover:shadow-lg transition-all duration-300"
-                onClick={() => handleImageClick(item.imageUrl)}
+                onClick={() => handleImageClick(item.imageUrl, item.type)}
               >
-                <div className="h-48 bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center group-hover:opacity-90 transition-opacity">
-                  <span className="text-white text-4xl">📷</span>
-                </div>
+                {item.type === 'image' ? (
+                  <div className="h-48 bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center group-hover:opacity-90 transition-opacity">
+                    <span className="text-white text-4xl">📷</span>
+                  </div>
+                ) : (
+                  <div className="h-48 bg-gradient-to-br from-red-400 to-red-600 flex items-center justify-center group-hover:opacity-90 transition-opacity relative">
+                    <span className="text-white text-4xl">▶️</span>
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="w-16 h-16 bg-red-600 rounded-full flex items-center justify-center opacity-80">
+                        <svg className="w-8 h-8 text-white ml-1" fill="currentColor" viewBox="0 0 24 24">
+                          <path d="M8 5v14l11-7z"/>
+                        </svg>
+                      </div>
+                    </div>
+                  </div>
+                )}
                 <div className="p-4">
                   <h3 className="font-semibold text-gray-800 mb-2 line-clamp-1">{item.title}</h3>
                   <p className="text-sm text-gray-600 mb-2 line-clamp-2">{item.description}</p>
                   <div className="flex items-center justify-between">
                     <span className="text-xs text-gray-500">{formatDate(item.date)}</span>
-                    <span className="text-xs px-2 py-1 bg-gray-100 text-gray-600 rounded-full">
-                      {item.category}
-                    </span>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs px-2 py-1 bg-gray-100 text-gray-600 rounded-full">
+                        {item.category}
+                      </span>
+                      <span className="text-xs px-2 py-1 bg-blue-100 text-blue-600 rounded-full">
+                        {item.type}
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -106,23 +126,23 @@ export default function GalleryPage() {
           /* No Results Message */
           <div className="text-center py-12">
             <div className="text-6xl mb-4">📷</div>
-            <h3 className="text-xl font-semibold text-gray-800 mb-2">No images found</h3>
+            <h3 className="text-xl font-semibold text-gray-800 mb-2">Tidak ada gambar ditemukan</h3>
             <p className="text-gray-600">
-              Try selecting a different category to see more content.
+              Coba pilih kategori lain untuk melihat lebih banyak konten.
             </p>
           </div>
         )}
 
         {/* Features Information */}
         <div className="bg-blue-50 rounded-lg p-8">
-          <h2 className="text-2xl font-semibold mb-4 text-blue-800">Gallery Features</h2>
+          <h2 className="text-2xl font-semibold mb-4 text-blue-800">Fitur Galeri</h2>
           <ul className="list-disc list-inside text-gray-700 space-y-2">
-            <li>Interactive image gallery with category filtering</li>
-            <li>Lightbox functionality for full-size image viewing</li>
-            <li>High-quality images of irrigation infrastructure and activities</li>
-            <li>Community events and farmer activities documentation</li>
-            <li>Responsive design for mobile and desktop viewing</li>
-            <li>Easy navigation between different gallery categories</li>
+            <li>Galeri gambar interaktif dengan filter kategori</li>
+            <li>Fungsi lightbox untuk melihat gambar ukuran penuh</li>
+            <li>Gambar berkualitas tinggi infrastruktur irigasi dan kegiatan</li>
+            <li>Dokumentasi acara komunitas dan kegiatan petani</li>
+            <li>Desain responsif untuk tampilan mobile dan desktop</li>
+            <li>Navigasi mudah antar kategori galeri</li>
           </ul>
         </div>
 
@@ -133,6 +153,7 @@ export default function GalleryPage() {
           imageUrl={selectedImage || ''}
           title={getSelectedImageData()?.title || ''}
           description={getSelectedImageData()?.description || ''}
+          type={selectedImageType}
         />
       </div>
     </div>

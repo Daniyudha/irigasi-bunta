@@ -29,21 +29,17 @@ export const waterLevelData: WaterLevelData[] = [
   { date: '2025-09-02', level: 2.6, area: 'Bunta' },
   { date: '2025-09-03', level: 2.5, area: 'Bunta' },
   { date: '2025-09-04', level: 2.5, area: 'Bunta' },
-  { date: '2025-09-01', level: 2.0, area: 'Bella' },
-  { date: '2025-09-02', level: 1.9, area: 'Bella' },
-  { date: '2025-09-03', level: 1.8, area: 'Bella' },
-  { date: '2025-09-04', level: 1.8, area: 'Bella' },
+  { date: '2025-09-01', level: 2.0, area: 'Bunta' },
+  { date: '2025-09-02', level: 1.9, area: 'Bunta' },
+  { date: '2025-09-03', level: 1.8, area: 'Bunta' },
+  { date: '2025-09-04', level: 1.8, area: 'Bunta' },
 ];
 
 export const rainfallData: RainfallData[] = [
   { date: '2025-09-01', rainfall: 12.5, area: 'Bunta' },
   { date: '2025-09-02', rainfall: 8.3, area: 'Bunta' },
   { date: '2025-09-03', rainfall: 5.1, area: 'Bunta' },
-  { date: '2025-09-04', rainfall: 2.0, area: 'Bunta' },
-  { date: '2025-09-01', rainfall: 10.2, area: 'Bella' },
-  { date: '2025-09-02', rainfall: 7.8, area: 'Bella' },
-  { date: '2025-09-03', rainfall: 4.5, area: 'Bella' },
-  { date: '2025-09-04', rainfall: 1.5, area: 'Bella' },
+  { date: '2025-09-04', rainfall: 2.0, area: 'Bunta' }
 ];
 
 export const cropData: CropData[] = [
@@ -54,6 +50,5 @@ export const cropData: CropData[] = [
 ];
 
 export const farmerData: FarmerData[] = [
-  { district: 'Bunta', farmers: 150, area: 650, averageYield: 5.2 },
-  { district: 'Bella', farmers: 100, area: 580, averageYield: 4.8 },
+  { district: 'Bunta', farmers: 250, area: 1230, averageYield: 5.0 },
 ];

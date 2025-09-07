@@ -97,7 +97,7 @@ export const galleryItems: GalleryItem[] = [
   {
     id: '9',
     title: 'New Pump Station',
-    description: 'Recently completed pump station for Bella District irrigation network.',
+    description: 'Recently completed pump station for Bunta District irrigation network.',
     imageUrl: '/images/gallery/pump-station.jpg',
     category: 'Infrastructure',
     date: '2025-06-15',

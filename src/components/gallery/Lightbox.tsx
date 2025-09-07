@@ -8,9 +8,10 @@ interface LightboxProps {
   imageUrl?: string;
   title: string;
   description: string;
+  type: 'image' | 'video';
 }
 
-export default function Lightbox({ isOpen, onClose, title, description }: LightboxProps) {
+export default function Lightbox({ isOpen, onClose, imageUrl, title, description, type }: LightboxProps) {
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
@@ -42,10 +43,32 @@ export default function Lightbox({ isOpen, onClose, title, description }: Lightb
           ✕
         </button>
 
-        {/* Image */}
+        {/* Media Content */}
         <div className="bg-white rounded-lg overflow-hidden">
           <div className="h-96 bg-gray-200 flex items-center justify-center">
-            <span className="text-gray-500">Gallery Image</span>
+            {type === 'image' ? (
+              imageUrl ? (
+                <img
+                  src={imageUrl}
+                  alt={title}
+                  className="w-full h-full object-contain"
+                />
+              ) : (
+                <span className="text-gray-500">No Image</span>
+              )
+            ) : (
+              // Video: YouTube embed
+              <iframe
+                width="100%"
+                height="100%"
+                src={imageUrl}
+                title={title}
+                frameBorder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+                className="w-full h-full"
+              ></iframe>
+            )}
           </div>
           
           {/* Caption */}

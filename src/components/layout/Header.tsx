@@ -2,21 +2,23 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { Menu, X } from 'lucide-react';
 import Image from 'next/image';
 
 const navigationItems = [
-    { name: 'Home', href: '/' },
-    { name: 'About Us', href: '/about' },
-    { name: 'Irrigation Profiles', href: '/irrigation' },
-    { name: 'Data & Statistics', href: '/data' },
-    { name: 'News', href: '/news' },
-    { name: 'Gallery', href: '/gallery' },
-    { name: 'Contact', href: '/contact' },
+    { name: 'Beranda', href: '/' },
+    { name: 'Tentang Kami', href: '/about' },
+    { name: 'Profil Irigasi', href: '/irrigation' },
+    { name: 'Data & Statistik', href: '/data' },
+    { name: 'Berita', href: '/news' },
+    { name: 'Galeri', href: '/gallery' },
+    { name: 'Kontak', href: '/contact' },
 ];
 
 export default function Header() {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const pathname = usePathname();
 
     return (
         <header className="bg-white shadow-lg sticky top-0 z-50">
@@ -35,21 +37,31 @@ export default function Header() {
                     </div>
 
                     {/* Desktop Navigation */}
-                    <nav className="hidden md:flex space-x-8">
-                        {navigationItems.map((item) => (
-                            <Link
-                                key={item.name}
-                                href={item.href}
-                                className="text-gray-700 hover:text-blue-600 transition-colors duration-200 font-medium"
-                            >
-                                {item.name}
-                            </Link>
-                        ))}
+                    <nav className="hidden lg:flex space-x-8">
+                        {navigationItems.map((item) => {
+                            const isActive = pathname === item.href ||
+                                           (item.href !== '/' && pathname.startsWith(item.href));
+                            return (
+                                <Link
+                                    key={item.name}
+                                    href={item.href}
+                                    className={`
+                                        transition-colors duration-200 font-medium
+                                        ${isActive
+                                            ? 'text-blue-600 border-b-2 border-blue-600'
+                                            : 'text-gray-700 hover:text-blue-600'
+                                        }
+                                    `}
+                                >
+                                    {item.name}
+                                </Link>
+                            );
+                        })}
                     </nav>
 
                     {/* Mobile Menu Button */}
                     <button
-                        className="md:hidden p-2 rounded-md text-gray-700 hover:text-blue-600 hover:bg-gray-100 transition-colors"
+                        className="lg:hidden p-2 rounded-md text-gray-700 hover:text-blue-600 hover:bg-gray-100 transition-colors"
                         onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                         aria-label="Toggle mobile menu"
                     >
@@ -59,18 +71,28 @@ export default function Header() {
 
                 {/* Mobile Navigation */}
                 {isMobileMenuOpen && (
-                    <div className="md:hidden">
+                    <div className="lg:hidden">
                         <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-white border-t">
-                            {navigationItems.map((item) => (
-                                <Link
-                                    key={item.name}
-                                    href={item.href}
-                                    className="block px-3 py-2 text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md transition-colors duration-200"
-                                    onClick={() => setIsMobileMenuOpen(false)}
-                                >
-                                    {item.name}
-                                </Link>
-                            ))}
+                            {navigationItems.map((item) => {
+                                const isActive = pathname === item.href ||
+                                               (item.href !== '/' && pathname.startsWith(item.href));
+                                return (
+                                    <Link
+                                        key={item.name}
+                                        href={item.href}
+                                        className={`
+                                            block px-3 py-2 rounded-md transition-colors duration-200
+                                            ${isActive
+                                                ? 'text-blue-600 bg-blue-50'
+                                                : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50'
+                                            }
+                                        `}
+                                        onClick={() => setIsMobileMenuOpen(false)}
+                                    >
+                                        {item.name}
+                                    </Link>
+                                );
+                            })}
                         </div>
                     </div>
                 )}

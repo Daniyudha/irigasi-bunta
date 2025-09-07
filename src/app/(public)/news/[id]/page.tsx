@@ -1,22 +1,83 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
-import { newsArticles } from '@/types/news';
+
+interface NewsArticle {
+  id: string;
+  title: string;
+  slug: string;
+  excerpt: string;
+  content: string;
+  image: string;
+  category: {
+    name: string;
+  };
+  createdAt: string;
+  published: boolean;
+  author?: string;
+  readTime?: number;
+  tags?: string[];
+}
 
 export default function NewsArticlePage() {
   const params = useParams();
   const articleId = params.id as string;
+  const [article, setArticle] = useState<NewsArticle | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const article = newsArticles.find(article => article.id === articleId);
+  useEffect(() => {
+    const fetchArticle = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch(`/api/news/${articleId}`);
+        if (response.ok) {
+          const data = await response.json();
+          setArticle(data);
+        } else {
+          setError('Article not found');
+        }
+      } catch (error) {
+        console.error('Error fetching article:', error);
+        setError('Failed to load article');
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  if (!article) {
+    if (articleId) {
+      fetchArticle();
+    }
+  }, [articleId]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen py-12 bg-gray-50">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="animate-pulse">
+            <div className="h-6 bg-gray-200 rounded w-1/4 mb-8"></div>
+            <div className="h-64 bg-gray-200 rounded mb-8"></div>
+            <div className="space-y-4">
+              <div className="h-4 bg-gray-200 rounded w-1/3"></div>
+              <div className="h-8 bg-gray-200 rounded w-3/4"></div>
+              <div className="h-4 bg-gray-200 rounded"></div>
+              <div className="h-4 bg-gray-200 rounded"></div>
+              <div className="h-4 bg-gray-200 rounded w-2/3"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+  if (error || !article) {
     return (
       <div className="min-h-screen py-12 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h1 className="text-4xl font-bold text-gray-800 mb-4">Article Not Found</h1>
           <p className="text-xl text-gray-600 mb-8">
-            The news article you&apos;re looking for doesn&apos;t exist.
+            {error || 'The news article you&apos;re looking for doesn&apos;t exist.'}
           </p>
           <Link
             href="/news"
@@ -57,9 +118,13 @@ export default function NewsArticlePage() {
 
         {/* Article Header */}
         <article className="bg-white rounded-lg shadow-lg overflow-hidden">
-          {article.imageUrl ? (
-            <div className="h-64 bg-gray-200 flex items-center justify-center">
-              <span className="text-gray-500">News Image</span>
+          {article.image ? (
+            <div className="h-64 bg-gray-200">
+              <img
+                src={article.image}
+                alt={article.title}
+                className="w-full h-full object-cover"
+              />
             </div>
           ) : (
             <div className="h-64 bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center">
@@ -72,11 +137,11 @@ export default function NewsArticlePage() {
             <div className="flex flex-wrap items-center justify-between mb-6">
               <div className="flex items-center space-x-4">
                 <span className="px-3 py-1 bg-blue-100 text-blue-800 text-sm font-medium rounded-full">
-                  {article.category}
+                  {article.category.name}
                 </span>
-                <span className="text-sm text-gray-500">{article.readTime} min read</span>
+                <span className="text-sm text-gray-500">{article.readTime || 5} min read</span>
               </div>
-              <span className="text-sm text-gray-500">{formatDate(article.publishDate)}</span>
+              <span className="text-sm text-gray-500">{formatDate(article.createdAt)}</span>
             </div>
 
             {/* Article Title */}
@@ -90,19 +155,18 @@ export default function NewsArticlePage() {
                 <span className="text-gray-600">👤</span>
               </div>
               <div>
-                <p className="font-medium text-gray-800">By {article.author}</p>
+                <p className="font-medium text-gray-800">By {article.author || 'Admin'}</p>
               </div>
             </div>
 
             {/* Article Content */}
-            <div className="prose prose-lg max-w-none mb-8">
-              <p className="text-gray-700 leading-relaxed">
-                {article.content}
-              </p>
-            </div>
+            <div
+              className="prose prose-lg max-w-none mb-8"
+              dangerouslySetInnerHTML={{ __html: article.content }}
+            />
 
             {/* Tags */}
-            {article.tags.length > 0 && (
+            {article.tags && article.tags.length > 0 && (
               <div className="mb-8">
                 <h3 className="text-sm font-semibold text-gray-700 mb-3">Tags</h3>
                 <div className="flex flex-wrap gap-2">
@@ -130,32 +194,7 @@ export default function NewsArticlePage() {
           </div>
         </article>
 
-        {/* Related Articles (placeholder) */}
-        <div className="mt-12">
-          <h2 className="text-2xl font-bold text-gray-800 mb-6">Related Articles</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {newsArticles
-              .filter(a => a.id !== article.id && a.category === article.category)
-              .slice(0, 2)
-              .map((relatedArticle) => (
-                <Link
-                  key={relatedArticle.id}
-                  href={`/news/${relatedArticle.id}`}
-                  className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow"
-                >
-                  <h3 className="text-lg font-semibold text-gray-800 mb-2">
-                    {relatedArticle.title}
-                  </h3>
-                  <p className="text-gray-600 text-sm mb-3">
-                    {relatedArticle.excerpt}
-                  </p>
-                  <span className="text-blue-600 text-sm font-medium">
-                    Read more →
-                  </span>
-                </Link>
-              ))}
-          </div>
-        </div>
+        {/* Related Articles - Temporarily removed as we need API endpoint for related articles */}
       </div>
     </div>
   );

@@ -98,8 +98,13 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(news, { status: 201 });
   } catch (error) {
     console.error('Error creating news:', error);
+    // Log detailed error information
+    if (error instanceof Error) {
+      console.error('Error message:', error.message);
+      console.error('Error stack:', error.stack);
+    }
     return NextResponse.json(
-      { message: 'Internal server error' },
+      { message: 'Internal server error', details: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }
     );
   }

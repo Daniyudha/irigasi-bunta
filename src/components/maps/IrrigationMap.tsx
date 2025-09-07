@@ -8,7 +8,7 @@ const DynamicMap = dynamic(() => import('./DynamicMap').then(mod => mod.default)
   ssr: false,
   loading: () => (
     <div className="w-full h-96 bg-gray-100 rounded-lg flex items-center justify-center">
-      <span className="text-gray-500">Loading map...</span>
+      <span className="text-gray-500">Memuat peta...</span>
     </div>
   )
 }) as React.ComponentType<IrrigationMapProps>;

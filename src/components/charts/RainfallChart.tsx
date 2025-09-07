@@ -16,7 +16,7 @@ export default function RainfallChart({ data }: RainfallChartProps) {
 
   return (
     <div className="w-full h-80">
-      <h3 className="text-lg font-semibold text-black mb-4 text-center">Rainfall Data (mm)</h3>
+      <h3 className="text-lg font-semibold text-black mb-4 text-center">Data Curah Hujan (mm)</h3>
       <ResponsiveContainer width="100%" height="100%">
         <BarChart
           data={chartData}
@@ -33,7 +33,6 @@ export default function RainfallChart({ data }: RainfallChartProps) {
           <Tooltip />
           <Legend />
           <Bar dataKey="Bunta" fill="#3b82f6" />
-          <Bar dataKey="Bella" fill="#10b981" />
         </BarChart>
       </ResponsiveContainer>
     </div>

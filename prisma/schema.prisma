@@ -163,3 +163,29 @@ model Gallery {
 
   @@map("gallery")
 }
+
+model WaterLevelData {
+  id          String   @id @default(cuid())
+  location    String
+  value       Float
+  unit        String   @default("cm")
+  measuredAt  DateTime
+  recordedBy  String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("water_level_data")
+}
+
+model RainfallData {
+  id          String   @id @default(cuid())
+  location    String
+  value       Float
+  unit        String   @default("mm")
+  measuredAt  DateTime
+  recordedBy  String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("rainfall_data")
+}
