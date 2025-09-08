@@ -1,40 +1,120 @@
+// src/components/editor/CKEditorClient.tsx
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
-// Disable TypeScript checking untuk CKEditor imports
-// @ts-ignore
-import { CKEditor } from '@ckeditor/ckeditor5-react';
-// @ts-ignore
-import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
+// Pastikan UploadLoader, UploadAdapterReturn, CKEditorEditorInstance, FileRepositoryPlugin
+// secara global tersedia atau diimpor jika diperlukan.
 
-interface CKEditorProps {
+class MyUploadAdapter {
+    private loader: UploadLoader;
+    private apiUrl: string;
+
+    constructor(loader: UploadLoader) {
+        this.loader = loader;
+        this.apiUrl = '/api/admin/media';
+    }
+
+    upload(): Promise<{ default: string }> {
+        return this.loader.file
+            .then((file: File) => new Promise((resolve, reject) => {
+                const formData = new FormData();
+                formData.append('file', file);
+
+                fetch(this.apiUrl, {
+                    method: 'POST',
+                    body: formData,
+                })
+                .then(res => {
+                    console.log('CKEditor upload response status:', res.status, res.statusText);
+                    if (!res.ok) {
+                        return res.json().then(data => {
+                            console.error('CKEditor upload failed with server response:', data);
+                            reject(data.error?.message || data.message || `Server error: ${res.status} ${res.statusText}`);
+                        }).catch(() => {
+                            reject(`Server error: ${res.status} ${res.statusText}`);
+                        });
+                    }
+                    return res.json();
+                })
+                .then(data => {
+                    if (data && data.url) {
+                        resolve({ default: data.url });
+                    } else {
+                        reject('Invalid response from server: URL not found.');
+                    }
+                })
+                .catch(error => {
+                    console.error('CKEditor upload network error:', error);
+                    reject(error.message || 'Network error during upload. Check console for details.');
+                });
+            }));
+    }
+    abort() {
+        console.log('Upload aborted.');
+    }
+}
+
+function MyCustomUploadAdapterPlugin(editor: CKEditorEditorInstance) {
+  const fileRepositoryPlugin = editor.plugins.get('FileRepository') as FileRepositoryPlugin;
+  fileRepositoryPlugin.createUploadAdapter = (loader: UploadLoader) => {
+    return new MyUploadAdapter(loader);
+  };
+}
+
+interface CKEditorClientProps {
   value: string;
   onChange: (value: string) => void;
   placeholder?: string;
   className?: string;
 }
 
-// Set license key untuk development
-if (typeof window !== 'undefined' && process.env.NODE_ENV === 'development') {
-  // @ts-ignore
-  window.CKEDITOR_LICENSE_KEY = 'GPL';
-}
-
-const CKEditorClient: React.FC<CKEditorProps> = ({
+const CKEditorClient: React.FC<CKEditorClientProps> = ({
   value,
   onChange,
   placeholder = 'Tulis sesuatu yang menarik...',
   className = '',
 }) => {
-  const [isMounted, setIsMounted] = useState(false);
+  const editorRef = useRef<{
+    // Gunakan any untuk menampung seluruh modul secara dinamis
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    CKEditorReactModule: any; 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    ClassicEditorModule: any;
+  } | null>(null);
+  const [isEditorLoaded, setIsEditorLoaded] = useState(false);
+
+  if (typeof window !== 'undefined' && process.env.NODE_ENV === 'development') {
+    // @ts-expect-error Setting global license key for CKEditor in development
+    window.CKEDITOR_LICENSE_KEY = 'GPL';
+  }
 
   useEffect(() => {
-    setIsMounted(true);
+    import('@ckeditor/ckeditor5-react')
+      .then(ckeditorModule => {
+        import('@ckeditor/ckeditor5-build-classic')
+          .then(classicEditorModule => {
+            editorRef.current = {
+              CKEditorReactModule: ckeditorModule, // Simpan seluruh objek modul
+              ClassicEditorModule: classicEditorModule, // Simpan seluruh objek modul
+            };
+            setIsEditorLoaded(true);
+          })
+          .catch(error => {
+            console.error("Failed to load ClassicEditor", error);
+          });
+      })
+      .catch(error => {
+        console.error("Failed to load CKEditor React component", error);
+      });
+    
+    return () => {
+      setIsEditorLoaded(false);
+      editorRef.current = null;
+    };
   }, []);
 
-  // Jangan render di server side
-  if (!isMounted) {
+  if (!isEditorLoaded || !editorRef.current) {
     return (
       <div className={`${className} border rounded p-4 bg-gray-50 min-h-[300px] flex items-center justify-center`}>
         <div className="text-gray-500">Loading editor...</div>
@@ -42,47 +122,24 @@ const CKEditorClient: React.FC<CKEditorProps> = ({
     );
   }
 
-  const uploadAdapter = (loader: any) => {
-    return {
-      upload: () => {
-        return new Promise((resolve, reject) => {
-          loader.file.then((file: File) => {
-            const formData = new FormData();
-            formData.append('file', file);
+  // Ambil komponen CKEditor dan ClassicEditor dari modul yang disimpan
+  // Gunakan optional chaining dan cast ke any jika perlu untuk mengakses properti
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const CKEditorComponent = (editorRef.current.CKEditorReactModule?.CKEditor || editorRef.current.CKEditorReactModule?.default?.CKEditor) as React.ComponentType<any>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const ClassicEditorComponent = (editorRef.current.ClassicEditorModule?.default || editorRef.current.ClassicEditorModule) as any;
 
-            fetch('/api/admin/media', {
-              method: 'POST',
-              body: formData,
-            })
-              .then((response) => {
-                if (!response.ok) {
-                  throw new Error('Upload failed');
-                }
-                return response.json();
-              })
-              .then((data: { url: string }) => {
-                resolve({
-                  default: data.url,
-                });
-              })
-              .catch((error: Error) => {
-                reject(error);
-              });
-          });
-        });
-      },
-    };
-  };
-
-  function uploadPlugin(editor: any) {
-    editor.plugins.get('FileRepository').createUploadAdapter = (loader: any) => {
-      return uploadAdapter(loader);
-    };
+  if (!CKEditorComponent || !ClassicEditorComponent) {
+    return (
+        <div className={`${className} border rounded p-4 bg-gray-50 min-h-[300px] flex items-center justify-center`}>
+            <div className="text-red-500">Error: Editor components not found after loading.</div>
+        </div>
+    );
   }
 
   const editorConfiguration = {
     placeholder,
-    extraPlugins: [uploadPlugin],
+    extraPlugins: [MyCustomUploadAdapterPlugin],
     toolbar: {
       items: [
         'heading',
@@ -108,14 +165,15 @@ const CKEditorClient: React.FC<CKEditorProps> = ({
 
   return (
     <div className={className}>
-      <CKEditor
-        editor={ClassicEditor}
+      <CKEditorComponent
+        editor={ClassicEditorComponent}
         data={value}
         config={editorConfiguration}
-        onReady={(editor: any) => {
+        onReady={(editor: CKEditorEditorInstance) => {
           console.log('Editor is ready to use!', editor);
         }}
-        onChange={(event: any, editor: any) => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        onChange={(event: unknown, editor: any) => {
           const data = editor.getData();
           onChange(data);
         }}
