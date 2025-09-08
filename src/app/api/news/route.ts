@@ -8,6 +8,25 @@ interface QueryParams {
   search?: string;
 }
 
+// Define proper TypeScript interfaces for the where clause
+interface WhereClause {
+  published: boolean;
+  category?: {
+    name: string;
+  };
+  OR?: Array<{
+    title?: {
+      contains: string;
+    };
+    excerpt?: {
+      contains: string;
+    };
+    content?: {
+      contains: string;
+    };
+  }>;
+}
+
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
@@ -18,8 +37,8 @@ export async function GET(request: NextRequest) {
 
     const skip = (page - 1) * limit;
 
-    // Build where clause for filtering
-    const where: any = {
+    // Build where clause for filtering with proper TypeScript types
+    const where: WhereClause = {
       published: true,
     };
 
