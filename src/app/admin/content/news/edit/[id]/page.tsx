@@ -216,8 +216,8 @@ export default function EditNews() {
     <div className="min-h-screen py-8">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-800">Edit News Article</h1>
-          <p className="text-gray-600 mt-2">Edit the news article details</p>
+          <h1 className="text-3xl font-bold text-gray-800">Edit Berita</h1>
+          <p className="text-gray-600 mt-2">Edit detail artikel berita</p>
         </div>
 
         {error && (
@@ -230,7 +230,7 @@ export default function EditNews() {
           <div className="grid grid-cols-1 gap-6">
             <div>
               <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-2">
-                Title *
+                Judul *
               </label>
               <input
                 type="text"
@@ -262,7 +262,7 @@ export default function EditNews() {
 
             <div>
               <label htmlFor="excerpt" className="block text-sm font-medium text-gray-700 mb-2">
-                Excerpt
+                Kutipan
               </label>
               <textarea
                 id="excerpt"
@@ -277,7 +277,7 @@ export default function EditNews() {
 
             <div>
               <label htmlFor="categoryId" className="block text-sm font-medium text-gray-700 mb-2">
-                Category
+                Kategori
               </label>
               <select
                 id="categoryId"
@@ -297,7 +297,7 @@ export default function EditNews() {
 
             <div>
               <label htmlFor="image" className="block text-sm font-medium text-gray-700 mb-2">
-                Image Upload
+                Upload Gambar (maks 5MB)
               </label>
               <input
                 type="file"
@@ -309,7 +309,7 @@ export default function EditNews() {
               />
               {formData.image && !imagePreview && (
                 <div className="mt-4">
-                  <p className="text-sm text-gray-600 mb-2">Current image:</p>
+                  <p className="text-sm text-gray-600 mb-2">Gambar terkini:</p>
                   <img
                     src={formData.image}
                     alt="Current"
@@ -334,7 +334,7 @@ export default function EditNews() {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Content *
+                Deskripsi Berita *
               </label>
               <CustomCKEditor
                 value={formData.content}
@@ -363,16 +363,16 @@ export default function EditNews() {
             <button
               type="button"
               onClick={() => router.back()}
-              className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
+              className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 cursor-pointer"
             >
-              Cancel
+              Batal
             </button>
             <button
               type="submit"
               disabled={saving}
-              className="px-4 py-2 bg-blue-600 text-white rounded-md text-sm font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-4 py-2 bg-blue-600 text-white rounded-md text-sm font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
             >
-              {saving ? 'Saving...' : 'Save Changes'}
+              {saving ? 'Saving...' : 'Siman Perubahan'}
             </button>
           </div>
         </form>

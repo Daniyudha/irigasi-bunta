@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
+import { galleryCategories } from '@/types/gallery';
 
 interface GalleryItem {
   id: string;
@@ -27,6 +28,7 @@ export default function EditGalleryClient({ id }: EditGalleryClientProps) {
   const [error, setError] = useState('');
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [videoPreviewUrl, setVideoPreviewUrl] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [formData, setFormData] = useState({
@@ -94,27 +96,33 @@ export default function EditGalleryClient({ id }: EditGalleryClientProps) {
       [name]: type === 'checkbox' ? (e.target as HTMLInputElement).checked : value,
     }));
 
-    // Handle YouTube URL preview for videos
-    if (name === 'imageUrl' && formData.type === 'video') {
-      const youtubeId = extractYoutubeId(value);
-      if (youtubeId) {
-        setVideoPreviewUrl(`https://www.youtube.com/embed/${youtubeId}`);
-      } else {
-        setVideoPreviewUrl(null);
-      }
-    }
   };
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file && file.type.startsWith('image/')) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const result = e.target?.result as string;
-        setImagePreview(result);
-        setFormData(prev => ({ ...prev, imageUrl: result }));
-      };
-      reader.readAsDataURL(file);
+      setUploading(true);
+      try {
+        const formData = new FormData();
+        formData.append('file', file);
+
+        const response = await fetch('/api/admin/media', {
+          method: 'POST',
+          body: formData,
+        });
+
+        if (response.ok) {
+          const media = await response.json();
+          setImagePreview(media.url);
+          setFormData(prev => ({ ...prev, imageUrl: media.url }));
+        } else {
+          setError('Failed to upload image');
+        }
+      } catch (err) {
+        setError('Error uploading image');
+      } finally {
+        setUploading(false);
+      }
     }
   };
 
@@ -124,61 +132,44 @@ export default function EditGalleryClient({ id }: EditGalleryClientProps) {
     return (match && match[2].length === 11) ? match[2] : null;
   };
 
+  // Handle video preview when imageUrl changes for videos
+  useEffect(() => {
+    if (formData.type === 'video' && formData.imageUrl) {
+      const youtubeId = extractYoutubeId(formData.imageUrl);
+      if (youtubeId) {
+        setVideoPreviewUrl(`https://www.youtube.com/embed/${youtubeId}`);
+      } else {
+        setVideoPreviewUrl(null);
+      }
+    } else if (formData.type === 'image') {
+      setVideoPreviewUrl(null);
+    }
+  }, [formData.imageUrl, formData.type]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError('');
 
-    // For images, we need to handle the file upload separately
-    if (formData.type === 'image' && imagePreview) {
-      // In a real application, you would upload the image to a server here
-      // and get the URL. For now, we'll use the data URL directly.
-      // Note: Data URLs are not ideal for production, consider using a proper file upload API
-      try {
-        const response = await fetch(`/api/admin/gallery/${id}`, {
-          method: 'PATCH',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            ...formData,
-            imageUrl: imagePreview, // This should be replaced with actual uploaded URL
-          }),
-        });
+    try {
+      const response = await fetch(`/api/admin/gallery/${id}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
 
-        if (response.ok) {
-          router.push('/admin/content/gallery');
-        } else {
-          const errorData = await response.json();
-          setError(errorData.message || 'Failed to update gallery item');
-        }
-      } catch (err) {
-        setError('Error updating gallery item');
-      } finally {
-        setLoading(false);
+      if (response.ok) {
+        router.push('/admin/content/gallery');
+      } else {
+        const errorData = await response.json();
+        setError(errorData.message || 'Failed to update gallery item');
       }
-    } else {
-      // For videos or if no image uploaded
-      try {
-        const response = await fetch(`/api/admin/gallery/${id}`, {
-          method: 'PATCH',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(formData),
-        });
-
-        if (response.ok) {
-          router.push('/admin/content/gallery');
-        } else {
-          const errorData = await response.json();
-          setError(errorData.message || 'Failed to update gallery item');
-        }
-      } catch (err) {
-        setError('Error updating gallery item');
-      } finally {
-        setLoading(false);
-      }
+    } catch (err) {
+      setError('Error updating gallery item');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -251,7 +242,11 @@ export default function EditGalleryClient({ id }: EditGalleryClientProps) {
                   onChange={handleImageUpload}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   required={formData.type === 'image'}
+                  disabled={uploading}
                 />
+                {uploading && (
+                  <p className="text-sm text-blue-600 mt-2">Uploading image...</p>
+                )}
                 {imagePreview && (
                   <div className="mt-4">
                     <p className="text-sm text-gray-600 mb-2">Image Preview:</p>
@@ -299,16 +294,23 @@ export default function EditGalleryClient({ id }: EditGalleryClientProps) {
               <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-2">
                 Category *
               </label>
-              <input
-                type="text"
+              <select
                 id="category"
                 name="category"
                 value={formData.category}
                 onChange={handleInputChange}
                 required
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="e.g., Events, Infrastructure, People"
-              />
+              >
+                <option value="">Select a category</option>
+                {galleryCategories
+                  .filter(category => category !== 'All')
+                  .map((category) => (
+                    <option key={category} value={category}>
+                      {category}
+                    </option>
+                  ))}
+              </select>
             </div>
 
             <div>

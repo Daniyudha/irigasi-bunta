@@ -18,9 +18,10 @@ export async function GET(
     // Only allow ADMIN or SUPER_ADMIN to access rainfall data
     const user = await prisma.user.findUnique({
       where: { email: session.user?.email || '' },
+      include: { role: true },
     });
 
-    if (!user || (user.role !== 'ADMIN' && user.role !== 'SUPER_ADMIN')) {
+    if (!user || !user.role || (user.role.name !== 'ADMIN' && user.role.name !== 'SUPER_ADMIN')) {
       return NextResponse.json({ message: 'Forbidden' }, { status: 403 });
     }
 
@@ -57,9 +58,10 @@ export async function PATCH(
     // Only allow ADMIN or SUPER_ADMIN to update rainfall data
     const user = await prisma.user.findUnique({
       where: { email: session.user?.email || '' },
+      include: { role: true },
     });
 
-    if (!user || (user.role !== 'ADMIN' && user.role !== 'SUPER_ADMIN')) {
+    if (!user || !user.role || (user.role.name !== 'ADMIN' && user.role.name !== 'SUPER_ADMIN')) {
       return NextResponse.json({ message: 'Forbidden' }, { status: 403 });
     }
 
@@ -110,9 +112,10 @@ export async function DELETE(
     // Only allow ADMIN or SUPER_ADMIN to delete rainfall data
     const user = await prisma.user.findUnique({
       where: { email: session.user?.email || '' },
+      include: { role: true },
     });
 
-    if (!user || (user.role !== 'ADMIN' && user.role !== 'SUPER_ADMIN')) {
+    if (!user || !user.role || (user.role.name !== 'ADMIN' && user.role.name !== 'SUPER_ADMIN')) {
       return NextResponse.json({ message: 'Forbidden' }, { status: 403 });
     }
 

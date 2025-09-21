@@ -91,6 +91,7 @@ export default function CreateNewsClient() {
     const response = await fetch('/api/admin/media', {
       method: 'POST',
       body: formData,
+      credentials: 'include', // Ensure cookies are sent for authentication
     });
 
     if (!response.ok) {
@@ -138,6 +139,7 @@ export default function CreateNewsClient() {
           ...formData,
           image: imageUrl,
         }),
+        credentials: 'include', // Ensure cookies are sent for authentication
       });
 
       if (response.ok) {

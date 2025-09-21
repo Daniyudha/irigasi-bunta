@@ -18,16 +18,26 @@ export default function LoginPage() {
     setError('');
 
     try {
+      // Use a clean callback URL to avoid passing error parameters from previous attempts
       const result = await signIn('credentials', {
         email,
         password,
         redirect: false,
+        callbackUrl: '/admin/dashboard',
       });
 
+      console.log('SignIn result:', result);
+      
       if (result?.error) {
+        console.log('SignIn error:', result.error);
         setError('Email atau kata sandi tidak valid');
-      } else {
+      } else if (result?.ok) {
+        console.log('SignIn successful, redirecting to dashboard');
         router.push('/admin/dashboard');
+        router.refresh(); // Force refresh to update session state
+      } else {
+        console.log('Unexpected result:', result);
+        setError('Terjadi kesalahan. Silakan coba lagi.');
       }
     } catch {
       setError('Terjadi kesalahan. Silakan coba lagi.');
@@ -119,16 +129,6 @@ export default function LoginPage() {
             </Link>
           </div>
         </form>
-
-        <div className="mt-6 text-center">
-          <div className="bg-gray-100 p-4 rounded-lg">
-            <h3 className="text-sm font-medium text-gray-900 mb-2">Kredensial Demo</h3>
-            <p className="text-xs text-gray-600">
-              Email: admin@buntabella.go.id<br />
-              Kata Sandi: admin123
-            </p>
-          </div>
-        </div>
       </div>
     </div>
   );

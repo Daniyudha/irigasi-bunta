@@ -5,6 +5,7 @@ import type { JWT as NextAuthJWT } from 'next-auth/jwt';
 declare module 'next-auth' {
   interface User extends NextAuthUser {
     role?: string;
+    permissions?: string[];
   }
 
   interface Session extends NextAuthSession {
@@ -14,6 +15,7 @@ declare module 'next-auth' {
       email?: string | null;
       image?: string | null;
       role?: string;
+      permissions?: string[];
     };
   }
 }
@@ -21,5 +23,6 @@ declare module 'next-auth' {
 declare module 'next-auth/jwt' {
   interface JWT extends NextAuthJWT {
     role?: string;
+    permissions?: string[];
   }
 }

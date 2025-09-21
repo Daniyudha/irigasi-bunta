@@ -1,31 +1,103 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import Lightbox from '@/components/gallery/Lightbox';
-import { galleryItems, galleryCategories, GalleryCategory } from '@/types/gallery';
+import { galleryCategories, GalleryCategory } from '@/types/gallery';
+
+interface GalleryItem {
+  id: string;
+  title: string;
+  description: string | null;
+  imageUrl: string;
+  category: string;
+  type: string;
+  date: string;
+  createdAt: string;
+}
 
 export default function GalleryPage() {
   const [selectedCategory, setSelectedCategory] = useState<GalleryCategory>('All');
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [selectedImageType, setSelectedImageType] = useState<'image' | 'video'>('image');
+  const [selectedImageIndex, setSelectedImageIndex] = useState<number>(-1);
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
+  const [galleryItems, setGalleryItems] = useState<GalleryItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const extractYoutubeId = (url: string): string | null => {
+    const regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/;
+    const match = url.match(regExp);
+    return (match && match[7].length === 11) ? match[7] : null;
+  };
+
+  const getEmbedUrl = (url: string): string => {
+    const youtubeId = extractYoutubeId(url);
+    if (youtubeId) {
+      return `https://www.youtube.com/embed/${youtubeId}`;
+    }
+    return url;
+  };
+
+  useEffect(() => {
+    const fetchGallery = async () => {
+      try {
+        const response = await fetch('/api/gallery');
+        if (response.ok) {
+          const data = await response.json();
+          setGalleryItems(data);
+        } else {
+          setError('Failed to fetch gallery items');
+        }
+      } catch (err) {
+        setError('Error fetching gallery items');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchGallery();
+  }, []);
 
   // Filter items based on category
   const filteredItems = useMemo(() => {
     return selectedCategory === 'All'
       ? galleryItems
       : galleryItems.filter(item => item.category === selectedCategory);
-  }, [selectedCategory]);
+  }, [selectedCategory, galleryItems]);
 
   const handleImageClick = (imageUrl: string, type: 'image' | 'video') => {
     setSelectedImage(imageUrl);
     setSelectedImageType(type);
+    const index = filteredItems.findIndex(item => item.imageUrl === imageUrl);
+    setSelectedImageIndex(index);
     setIsLightboxOpen(true);
   };
 
   const closeLightbox = () => {
     setIsLightboxOpen(false);
     setSelectedImage(null);
+    setSelectedImageIndex(-1);
+  };
+
+  const handleNext = () => {
+    if (selectedImageIndex < filteredItems.length - 1) {
+      const nextIndex = selectedImageIndex + 1;
+      const nextItem = filteredItems[nextIndex];
+      setSelectedImage(nextItem.imageUrl);
+      setSelectedImageType(nextItem.type as 'image' | 'video');
+      setSelectedImageIndex(nextIndex);
+    }
+  };
+
+  const handlePrev = () => {
+    if (selectedImageIndex > 0) {
+      const prevIndex = selectedImageIndex - 1;
+      const prevItem = filteredItems[prevIndex];
+      setSelectedImage(prevItem.imageUrl);
+      setSelectedImageType(prevItem.type as 'image' | 'video');
+      setSelectedImageIndex(prevIndex);
+    }
   };
 
   const getSelectedImageData = () => {
@@ -40,6 +112,26 @@ export default function GalleryPage() {
       day: 'numeric'
     });
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen py-12 bg-gray-50 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen py-12 bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="text-6xl mb-4">⚠️</div>
+          <h3 className="text-xl font-semibold text-gray-800 mb-2">Error loading gallery</h3>
+          <p className="text-gray-600">{error}</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen py-12 bg-gray-50">
@@ -86,22 +178,38 @@ export default function GalleryPage() {
               <div
                 key={item.id}
                 className="bg-white rounded-lg shadow-md overflow-hidden group cursor-pointer hover:shadow-lg transition-all duration-300"
-                onClick={() => handleImageClick(item.imageUrl, item.type)}
+                onClick={() => handleImageClick(item.imageUrl, item.type as 'image' | 'video')}
               >
                 {item.type === 'image' ? (
-                  <div className="h-48 bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center group-hover:opacity-90 transition-opacity">
-                    <span className="text-white text-4xl">📷</span>
+                  <div className="h-48 bg-gray-200 flex items-center justify-center overflow-hidden group-hover:opacity-90 transition-opacity">
+                    <img
+                      src={item.imageUrl}
+                      alt={item.title}
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        e.currentTarget.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgZmlsbD0iI2U1ZTVlNSIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBkeT0iLjM1ZW0iIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iMjAiIGZvbnQtZmFtaWx5PSJtb25vc3BhY2UiIGZpbGw9IiM5OTk5OTkiPk5vIEltYWdlPC90ZXh0Pjwvc3ZnPg==';
+                      }}
+                    />
                   </div>
                 ) : (
-                  <div className="h-48 bg-gradient-to-br from-red-400 to-red-600 flex items-center justify-center group-hover:opacity-90 transition-opacity relative">
-                    <span className="text-white text-4xl">▶️</span>
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <div className="w-16 h-16 bg-red-600 rounded-full flex items-center justify-center opacity-80">
-                        <svg className="w-8 h-8 text-white ml-1" fill="currentColor" viewBox="0 0 24 24">
-                          <path d="M8 5v14l11-7z"/>
-                        </svg>
-                      </div>
-                    </div>
+                  <div className="h-48 bg-gray-200 flex items-center justify-center overflow-hidden group-hover:opacity-90 transition-opacity">
+                    <iframe
+                      src={getEmbedUrl(item.imageUrl)}
+                      className="w-full h-48 rounded-md border"
+                      frameBorder="0"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                      onError={(e) => {
+                        console.error('Failed to load video:', item.imageUrl);
+                        const iframe = e.currentTarget as HTMLIFrameElement;
+                        iframe.style.display = 'none';
+                        // Show error message
+                        const errorDiv = document.createElement('div');
+                        errorDiv.className = 'flex items-center justify-center h-full text-red-500';
+                        errorDiv.innerHTML = 'Failed to load video';
+                        iframe.parentNode?.appendChild(errorDiv);
+                      }}
+                    />
                   </div>
                 )}
                 <div className="p-4">
@@ -133,19 +241,6 @@ export default function GalleryPage() {
           </div>
         )}
 
-        {/* Features Information */}
-        <div className="bg-blue-50 rounded-lg p-8">
-          <h2 className="text-2xl font-semibold mb-4 text-blue-800">Fitur Galeri</h2>
-          <ul className="list-disc list-inside text-gray-700 space-y-2">
-            <li>Galeri gambar interaktif dengan filter kategori</li>
-            <li>Fungsi lightbox untuk melihat gambar ukuran penuh</li>
-            <li>Gambar berkualitas tinggi infrastruktur irigasi dan kegiatan</li>
-            <li>Dokumentasi acara komunitas dan kegiatan petani</li>
-            <li>Desain responsif untuk tampilan mobile dan desktop</li>
-            <li>Navigasi mudah antar kategori galeri</li>
-          </ul>
-        </div>
-
         {/* Lightbox */}
         <Lightbox
           isOpen={isLightboxOpen}
@@ -154,6 +249,10 @@ export default function GalleryPage() {
           title={getSelectedImageData()?.title || ''}
           description={getSelectedImageData()?.description || ''}
           type={selectedImageType}
+          onNext={handleNext}
+          onPrev={handlePrev}
+          hasNext={selectedImageIndex < filteredItems.length - 1}
+          hasPrev={selectedImageIndex > 0}
         />
       </div>
     </div>

@@ -265,7 +265,7 @@ export default function NewsPage() {
                 <button
                   onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
                   disabled={currentPage === 1 || gridLoading}
-                  className="px-4 py-2 bg-white border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+                  className="px-4 py-2 text-black bg-white shadow-2xl rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-blue-100 cursor-pointer"
                 >
                   Sebelumnya
                 </button>
@@ -287,7 +287,7 @@ export default function NewsPage() {
                 <button
                   onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
                   disabled={currentPage === totalPages || gridLoading}
-                  className="px-4 py-2 bg-white border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+                  className="px-4 py-2 text-black bg-white shadow-2xl rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-blue-100 cursor-pointer"
                 >
                   Berikutnya
                 </button>
@@ -296,7 +296,7 @@ export default function NewsPage() {
           </>
         ) : (
           /* No Results Message */
-          <div className="text-center py-12">
+          <div className="text-center py-46">
             <div className="text-6xl mb-4">📰</div>
             <h3 className="text-xl font-semibold text-gray-800 mb-2">Tidak ada artikel ditemukan</h3>
             <p className="text-gray-600">

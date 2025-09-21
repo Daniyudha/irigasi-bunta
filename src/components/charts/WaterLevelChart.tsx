@@ -8,6 +8,17 @@ interface WaterLevelChartProps {
 }
 
 export default function WaterLevelChart({ data }: WaterLevelChartProps) {
+  if (!data || data.length === 0) {
+    return (
+      <div className="w-full h-80 flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-gray-500 text-lg">Tidak ada data level air yang tersedia</p>
+          <p className="text-gray-400 text-sm">Silakan tambahkan data level air terlebih dahulu</p>
+        </div>
+      </div>
+    );
+  }
+
   // Group data by area for the chart
   const chartData = data.map(item => ({
     date: item.date,

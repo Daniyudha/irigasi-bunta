@@ -55,7 +55,7 @@ export default function NewsArticlePage() {
   if (loading) {
     return (
       <div className="min-h-screen py-12 bg-gray-50">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="animate-pulse">
             <div className="h-6 bg-gray-200 rounded w-1/4 mb-8"></div>
             <div className="h-64 bg-gray-200 rounded mb-8"></div>
@@ -100,7 +100,7 @@ export default function NewsArticlePage() {
 
   return (
     <div className="min-h-screen py-12 bg-gray-50">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Breadcrumb */}
         <nav className="mb-8">
           <ol className="flex items-center space-x-2 text-sm text-gray-600">
@@ -119,7 +119,7 @@ export default function NewsArticlePage() {
         {/* Article Header */}
         <article className="bg-white rounded-lg shadow-lg overflow-hidden">
           {article.image ? (
-            <div className="h-64 bg-gray-200">
+            <div className="h-100 bg-gray-200">
               <img
                 src={article.image}
                 alt={article.title}
@@ -161,7 +161,7 @@ export default function NewsArticlePage() {
 
             {/* Article Content */}
             <div
-              className="prose prose-lg max-w-none mb-8"
+              className="prose prose-lg max-w-none mb-8 text-black"
               dangerouslySetInnerHTML={{ __html: article.content }}
             />
 

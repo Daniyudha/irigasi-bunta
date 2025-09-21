@@ -23,16 +23,22 @@ export default async function AdminData() {
           <div className="bg-white p-6 rounded-lg shadow-md">
             <h3 className="text-xl font-semibold mb-4 text-blue-600">Data Ketinggian Air</h3>
             <p className="text-gray-600 mb-4">Kelola data TMA (Tinggi Muka Air)</p>
-            <a href="/admin/data/input?type=water-level" className="block w-full bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 transition-colors text-center">
+            <a href="/admin/data/input?type=water-level" className="block w-full bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 transition-colors text-center mb-2">
               Input Data
+            </a>
+            <a href="/admin/data/management?type=water-level" className="block w-full bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition-colors text-center">
+              Kelola Data
             </a>
           </div>
 
           <div className="bg-white p-6 rounded-lg shadow-md">
             <h3 className="text-xl font-semibold mb-4 text-green-600">Data Curah Hujan</h3>
             <p className="text-gray-600 mb-4">Kelola pengukuran curah hujan</p>
-            <a href="/admin/data/input?type=rainfall" className="block w-full bg-green-600 text-white py-2 px-4 rounded hover:bg-green-700 transition-colors text-center">
+            <a href="/admin/data/input?type=rainfall" className="block w-full bg-green-600 text-white py-2 px-4 rounded hover:bg-green-700 transition-colors text-center mb-2">
               Input Data
+            </a>
+            <a href="/admin/data/management?type=rainfall" className="block w-full bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600 transition-colors text-center">
+              Kelola Data
             </a>
           </div>
 
@@ -66,6 +72,28 @@ export default async function AdminData() {
             <button className="w-full bg-red-600 text-white py-2 px-4 rounded hover:bg-red-700 transition-colors">
               Validasi Data
             </button>
+          </div>
+
+          <div className="bg-white p-6 rounded-lg shadow-md">
+            <h3 className="text-xl font-semibold mb-4 text-amber-600">Data Tanaman</h3>
+            <p className="text-gray-600 mb-4">Kelola data tanaman dan produksi</p>
+            <a href="/admin/data/input?type=crop" className="block w-full bg-amber-600 text-white py-2 px-4 rounded hover:bg-amber-700 transition-colors text-center mb-2">
+              Input Data
+            </a>
+            <a href="/admin/data/management?type=crop" className="block w-full bg-amber-500 text-white py-2 px-4 rounded hover:bg-amber-600 transition-colors text-center">
+              Kelola Data
+            </a>
+          </div>
+
+          <div className="bg-white p-6 rounded-lg shadow-md">
+            <h3 className="text-xl font-semibold mb-4 text-indigo-600">Data Petani</h3>
+            <p className="text-gray-600 mb-4">Kelola data petani dan statistik</p>
+            <a href="/admin/data/input?type=farmer" className="block w-full bg-indigo-600 text-white py-2 px-4 rounded hover:bg-indigo-700 transition-colors text-center mb-2">
+              Input Data
+            </a>
+            <a href="/admin/data/management?type=farmer" className="block w-full bg-indigo-500 text-white py-2 px-4 rounded hover:bg-indigo-600 transition-colors text-center">
+              Kelola Data
+            </a>
           </div>
         </div>
       </div>

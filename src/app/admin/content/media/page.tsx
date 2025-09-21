@@ -46,8 +46,8 @@ export default function MediaManagementPage() {
   useEffect(() => {
     if (status === 'loading') return;
 
-    if (!session || session.user.role !== 'ADMIN') {
-      router.push('/admin/login');
+    if (!session || !session.user?.permissions?.includes('media:read')) {
+      router.push('/login');
       return;
     }
 
@@ -129,7 +129,7 @@ export default function MediaManagementPage() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold text-gray-800">Media Library</h1>
       </div>
@@ -148,7 +148,7 @@ export default function MediaManagementPage() {
             placeholder="Search media files..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="flex-1 px-4 py-2 text-black border bg-white border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
           <button
             type="submit"

@@ -29,13 +29,6 @@ export default async function AdminContent() {
             </Link>
           </div>
 
-          <div className="bg-white p-6 rounded-lg shadow-md">
-            <h3 className="text-xl font-semibold mb-4 text-green-600">Halaman Statis</h3>
-            <p className="text-gray-600 mb-4">Edit Tentang Kami dan halaman lainnya</p>
-            <Link href="/admin/content/pages" className="block w-full bg-green-600 text-white py-2 px-4 rounded hover:bg-green-700 transition-colors text-center">
-              Kelola Halaman
-            </Link>
-          </div>
 
           <div className="bg-white p-6 rounded-lg shadow-md">
             <h3 className="text-xl font-semibold mb-4 text-purple-600">Galeri</h3>

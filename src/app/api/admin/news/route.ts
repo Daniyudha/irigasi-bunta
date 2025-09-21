@@ -14,28 +14,69 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const page = parseInt(searchParams.get('page') || '1');
     const limit = parseInt(searchParams.get('limit') || '10');
+    const search = searchParams.get('search') || '';
     const skip = (page - 1) * limit;
 
-    const news = await prisma.news.findMany({
-      skip,
-      take: limit,
-      orderBy: { createdAt: 'desc' },
-      include: {
-        category: {
-          select: {
-            name: true,
+    // Build where clause for search
+    // Use simple contains instead of case-insensitive mode for better compatibility
+    const where = search ? {
+      OR: [
+        { title: { contains: search } },
+        { slug: { contains: search } },
+        { content: { contains: search } },
+      ],
+    } : {};
+
+    console.log('Search query:', search);
+    console.log('Where clause:', JSON.stringify(where, null, 2));
+    
+    let news, total;
+    try {
+      [news, total] = await Promise.all([
+        prisma.news.findMany({
+          skip,
+          take: limit,
+          where,
+          orderBy: { createdAt: 'desc' },
+          include: {
+            category: {
+              select: {
+                name: true,
+              },
+            },
           },
+        }),
+        prisma.news.count({ where }),
+      ]);
+    } catch (dbError) {
+      console.error('Database error:', dbError);
+      return NextResponse.json(
+        {
+          message: 'Database query failed',
+          details: dbError instanceof Error ? dbError.message : 'Unknown database error'
         },
-      },
+        { status: 500 }
+      );
+    }
+    const totalPages = Math.ceil(total / limit);
+
+    return NextResponse.json({
+      news,
+      totalPages,
+      totalCount: total,
+      currentPage: page,
+      hasNext: page < totalPages,
+      hasPrev: page > 1
     });
-
-    const total = await prisma.news.count();
-
-    return NextResponse.json(news);
   } catch (error) {
     console.error('Error fetching news:', error);
+    // Log detailed error information
+    if (error instanceof Error) {
+      console.error('Error message:', error.message);
+      console.error('Error stack:', error.stack);
+    }
     return NextResponse.json(
-      { message: 'Internal server error' },
+      { message: 'Internal server error', details: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }
     );
   }

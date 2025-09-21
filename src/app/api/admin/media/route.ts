@@ -7,11 +7,8 @@ import path from 'path';
 
 export async function GET(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
-    
-    if (!session || session.user.role !== 'ADMIN') {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+    // Middleware already handles authentication and authorization
+    // We can proceed directly to fetching media data
 
     const { searchParams } = new URL(request.url);
     const page = parseInt(searchParams.get('page') || '1');
@@ -62,10 +59,21 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
+    // Use server session for authentication (consistent with other API routes)
     const session = await getServerSession(authOptions);
-    
-    if (!session || session.user.role !== 'ADMIN') {
+
+    if (!session || !session.user?.email) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    // Get user details for caption
+    const user = await prisma.user.findUnique({
+      where: { email: session.user.email },
+      select: { id: true, name: true, email: true },
+    });
+
+    if (!user) {
+      return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
     // Check if request is multipart/form-data for file upload
@@ -115,7 +123,7 @@ export async function POST(request: NextRequest) {
           path: url, // Store the URL path instead of file system path
           url,
           altText: originalName,
-          caption: `Uploaded by ${session.user.name || session.user.email}`,
+          caption: `Uploaded by ${user?.name || user?.email || 'Unknown user'}`,
         },
       });
 

@@ -12,12 +12,32 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
     }
 
-    // Only allow ADMIN or SUPER_ADMIN to access user list
+    // Check if user has permission to view users
     const user = await prisma.user.findUnique({
       where: { email: session.user?.email || '' },
+      include: {
+        role: {
+          include: {
+            permissions: {
+              include: {
+                permission: true,
+              },
+            },
+          },
+        },
+      },
     });
 
-    if (!user || (user.role !== 'ADMIN' && user.role !== 'SUPER_ADMIN')) {
+    if (!user || !user.role) {
+      return NextResponse.json({ message: 'Forbidden' }, { status: 403 });
+    }
+
+    // Check if user has users:read permission
+    const hasReadPermission = user.role.permissions.some(
+      (rolePermission) => rolePermission.permission.name === 'users:read'
+    );
+
+    if (!hasReadPermission) {
       return NextResponse.json({ message: 'Forbidden' }, { status: 403 });
     }
 
@@ -26,7 +46,13 @@ export async function GET(request: NextRequest) {
         id: true,
         name: true,
         email: true,
-        role: true,
+        roleId: true,
+        role: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
         createdAt: true,
         updatedAt: true,
         _count: {
@@ -56,20 +82,40 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
     }
 
-    // Only allow SUPER_ADMIN to create new users
+    // Check if user has permission to create users
     const currentUser = await prisma.user.findUnique({
       where: { email: session.user?.email || '' },
+      include: {
+        role: {
+          include: {
+            permissions: {
+              include: {
+                permission: true,
+              },
+            },
+          },
+        },
+      },
     });
 
-    if (!currentUser || currentUser.role !== 'SUPER_ADMIN') {
+    if (!currentUser || !currentUser.role) {
+      return NextResponse.json({ message: 'Forbidden' }, { status: 403 });
+    }
+
+    // Check if user has users:create permission
+    const hasCreatePermission = currentUser.role.permissions.some(
+      (rolePermission) => rolePermission.permission.name === 'users:create'
+    );
+
+    if (!hasCreatePermission) {
       return NextResponse.json({ message: 'Forbidden' }, { status: 403 });
     }
 
     const body = await request.json();
-    const { name, email, password, role } = body;
+    const { name, email, password, roleId } = body;
 
     // Validate required fields
-    if (!name || !email || !password || !role) {
+    if (!name || !email || !password || !roleId) {
       return NextResponse.json(
         { message: 'Name, email, password, and role are required' },
         { status: 400 }
@@ -96,13 +142,19 @@ export async function POST(request: NextRequest) {
         name,
         email,
         password: hashedPassword,
-        role,
+        roleId,
       },
       select: {
         id: true,
         name: true,
         email: true,
-        role: true,
+        roleId: true,
+        role: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
         createdAt: true,
       },
     });

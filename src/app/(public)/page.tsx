@@ -1,38 +1,10 @@
+import SliderCarousel from '@/components/SliderCarousel';
+
 export default function Home() {
   return (
     <div className="min-h-screen">
-      {/* Hero Section */}
-      <section
-        className="relative bg-gradient-to-br from-blue-600 to-blue-800 text-white py-30"
-        style={{
-          backgroundImage: 'url(/images/hero-bg.jpeg)',
-          backgroundSize: 'cover',
-          backgroundPosition: 'center'
-        }}
-      >
-        {/* Overlay */}
-        <div className="absolute inset-0 bg-black/50"></div>
-
-        {/* Konten */}
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <h1 className="text-4xl md:text-6xl font-bold mb-6">
-              Sistem Irigasi Bunta
-            </h1>
-            <p className="text-xl md:text-2xl mb-8 max-w-3xl mx-auto">
-              Informasi lengkap manajemen air dan irigasi untuk petani dan pemangku kepentingan di wilayah Bunta.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <button className="bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors">
-                Lihat Level Air
-              </button>
-              <button className="border-2 border-white text-white px-8 py-3 rounded-lg font-semibold hover:bg-white hover:text-blue-600 transition-colors">
-                Pelajari Lebih Lanjut
-              </button>
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* Hero Section with Slider Carousel */}
+      <SliderCarousel />
 
 
       {/* Features Section */}
@@ -83,11 +55,11 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
             <div>
-              <div className="text-3xl md:text-4xl font-bold text-blue-600 mb-2">250+</div>
+              <div className="text-3xl md:text-4xl font-bold text-blue-600 mb-2">100+</div>
               <div className="text-gray-600">Petani Dilayani</div>
             </div>
             <div>
-              <div className="text-3xl md:text-4xl font-bold text-green-600 mb-2">1,200+</div>
+              <div className="text-3xl md:text-4xl font-bold text-green-600 mb-2">2.481</div>
               <div className="text-gray-600">Hektar Tercover</div>
             </div>
             <div>
@@ -95,8 +67,8 @@ export default function Home() {
               <div className="text-gray-600">Pemantauan</div>
             </div>
             <div>
-              <div className="text-3xl md:text-4xl font-bold text-purple-600 mb-2">15+</div>
-              <div className="text-gray-600">Tahun Pengalaman</div>
+              <div className="text-3xl md:text-4xl font-bold text-purple-600 mb-2">30+</div>
+              <div className="text-gray-600">Tahun Beroperasi</div>
             </div>
           </div>
         </div>
@@ -106,7 +78,7 @@ export default function Home() {
       <section className="py-16 bg-blue-600 text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-6">
-            Ada Keluhan Dengan Jaringan Irigasi di Bunta?
+            Ada Keluhan Dengan Jaringan Irigasi Kami?
           </h2>
           <p className="text-xl mb-8 max-w-2xl mx-auto">
             Diskusikan dengan kami untuk mendapatkan pelayanan yang baik dan andal.

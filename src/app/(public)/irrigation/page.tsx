@@ -54,7 +54,7 @@ export default function IrrigationPage() {
         </div>
 
         {/* Area Details Section */}
-        {selectedArea && (
+        {/* {selectedArea && (
           <div className="mb-12">
             <div className="bg-white rounded-lg shadow-lg p-6">
               <h2 className="text-2xl font-semibold mb-4 text-blue-800">
@@ -92,10 +92,10 @@ export default function IrrigationPage() {
               </div>
             </div>
           </div>
-        )}
+        )} */}
 
         {/* All Areas Overview */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+        <div className="grid grid-cols-1 gap-8 mb-12">
           {irrigationAreas.map((area) => (
             <div key={area.id} className="bg-white p-6 rounded-lg shadow-md">
               <h2 className="text-2xl font-semibold mb-4 text-blue-600">{area.name}</h2>

@@ -1,12 +1,117 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import WaterLevelChart from '@/components/charts/WaterLevelChart';
 import RainfallChart from '@/components/charts/RainfallChart';
-import { waterLevelData, rainfallData, cropData, farmerData } from '@/types/data';
+import { WaterLevelData as ChartWaterLevelData, RainfallData as ChartRainfallData } from '@/types/data';
+
+interface DbWaterLevelData {
+  id: string;
+  location: string;
+  value: number;
+  unit: string;
+  measuredAt: string;
+}
+
+interface DbRainfallData {
+  id: string;
+  location: string;
+  value: number;
+  unit: string;
+  measuredAt: string;
+}
+
+interface DbCropData {
+  id: string;
+  crop: string;
+  area: number;
+  production: number;
+  season: string;
+  location: string | null;
+  createdAt: string;
+}
+
+interface DbFarmerData {
+  id: string;
+  name: string;
+  group: string;
+  chairman: string;
+  members: string[];
+  createdAt: string;
+}
 
 export default function DataPage() {
   const [activeTab, setActiveTab] = useState('water');
+  const [chartWaterData, setChartWaterData] = useState<ChartWaterLevelData[]>([]);
+  const [chartRainfallData, setChartRainfallData] = useState<ChartRainfallData[]>([]);
+  const [cropData, setCropData] = useState<DbCropData[]>([]);
+  const [farmerData, setFarmerData] = useState<DbFarmerData[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    fetchData();
+  }, [activeTab]);
+
+  const fetchData = async () => {
+    setLoading(true);
+    setError('');
+
+    try {
+      if (activeTab === 'water') {
+        const response = await fetch('/api/data/water-level');
+        if (response.ok) {
+          const data: DbWaterLevelData[] = await response.json();
+          console.log('Raw water level data from API:', data);
+          // Transform database data to chart format
+          const transformedData: ChartWaterLevelData[] = data.map(item => ({
+            date: item.measuredAt?.split('T')[0] || new Date().toISOString().split('T')[0],
+            level: Number(item.value) || 0,
+            area: 'Bunta' // Force area to be 'Bunta' for chart compatibility
+          }));
+          console.log('Water level transformed data:', transformedData);
+          setChartWaterData(transformedData);
+        } else {
+          setError('Gagal mengambil data level air');
+        }
+      } else if (activeTab === 'rainfall') {
+        const response = await fetch('/api/data/rainfall');
+        if (response.ok) {
+          const data: DbRainfallData[] = await response.json();
+          // Transform database data to chart format
+          const transformedData: ChartRainfallData[] = data.map(item => ({
+            date: item.measuredAt?.split('T')[0] || new Date().toISOString().split('T')[0],
+            rainfall: Number(item.value) || 0,
+            area: 'Bunta' // Force area to be 'Bunta' for chart compatibility
+          }));
+          console.log('Rainfall transformed data:', transformedData);
+          setChartRainfallData(transformedData);
+        } else {
+          setError('Gagal mengambil data curah hujan');
+        }
+      } else if (activeTab === 'crops') {
+        const response = await fetch('/api/data/crops');
+        if (response.ok) {
+          const data: DbCropData[] = await response.json();
+          setCropData(data);
+        } else {
+          setError('Gagal mengambil data tanaman');
+        }
+      } else if (activeTab === 'farmers') {
+        const response = await fetch('/api/data/farmers');
+        if (response.ok) {
+          const data: DbFarmerData[] = await response.json();
+          setFarmerData(data);
+        } else {
+          setError('Gagal mengambil data petani');
+        }
+      }
+    } catch (err) {
+      setError('Error mengambil data');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const tabs = [
     { id: 'water', label: 'Level Air', icon: '💧' },
@@ -18,9 +123,9 @@ export default function DataPage() {
   const renderTabContent = () => {
     switch (activeTab) {
       case 'water':
-        return <WaterLevelChart data={waterLevelData} />;
+        return <WaterLevelChart data={chartWaterData} />;
       case 'rainfall':
-        return <RainfallChart data={rainfallData} />;
+        return <RainfallChart data={chartRainfallData} />;
       case 'crops':
         return (
           <div className="w-full">
@@ -37,10 +142,10 @@ export default function DataPage() {
                 </thead>
                 <tbody>
                   {cropData.map((crop, index) => (
-                    <tr key={index} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                    <tr key={crop.id} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
                       <td className="px-4 py-2 text-black border-gray-50">{crop.crop}</td>
-                      <td className="px-4 py-2 text-black border-gray-50">{crop.area.toLocaleString()}</td>
-                      <td className="px-4 py-2 text-black border-gray-50">{crop.production.toLocaleString()}</td>
+                      <td className="px-4 py-2 text-black border-gray-50">{crop.area?.toLocaleString('id-ID') || '0'}</td>
+                      <td className="px-4 py-2 text-black border-gray-50">{crop.production?.toLocaleString('id-ID') || '0'}</td>
                       <td className="px-4 py-2 text-black border-gray-50">{(crop.production / crop.area).toFixed(1)}</td>
                     </tr>
                   ))}
@@ -52,24 +157,26 @@ export default function DataPage() {
       case 'farmers':
         return (
           <div className="w-full">
-            <h3 className="text-lg font-semibold text-black mb-4 text-center">Statistik Petani per Kecamatan</h3>
+            <h3 className="text-lg font-semibold text-black mb-4 text-center">Data Kelompok Tani</h3>
             <div className="overflow-x-auto">
               <table className="min-w-full bg-white border border-gray-200">
                 <thead>
                   <tr className="bg-gray-50 text-black">
-                    <th className="px-4 py-2 text-left font-semibold">Kecamatan</th>
-                    <th className="px-4 py-2 text-left font-semibold">Petani</th>
-                    <th className="px-4 py-2 text-left font-semibold">Area (ha)</th>
-                    <th className="px-4 py-2 text-left font-semibold">Rata-rata Hasil (ton/ha)</th>
+                    <th className="px-4 py-2 text-left font-semibold">Nama Kelompok</th>
+                    <th className="px-4 py-2 text-left font-semibold">Ketua</th>
+                    <th className="px-4 py-2 text-left font-semibold">Jumlah Anggota</th>
+                    <th className="px-4 py-2 text-left font-semibold">Tanggal Dibentuk</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {farmerData.map((district, index) => (
-                    <tr key={index} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
-                      <td className="px-4 py-2 text-black border-gray-50">{district.district}</td>
-                      <td className="px-4 py-2 text-black border-gray-50">{district.farmers.toLocaleString()}</td>
-                      <td className="px-4 py-2 text-black border-gray-50">{district.area.toLocaleString()}</td>
-                      <td className="px-4 py-2 text-black border-gray-50">{district.averageYield.toFixed(1)}</td>
+                  {farmerData.map((farmer, index) => (
+                    <tr key={farmer.id} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                      <td className="px-4 py-2 text-black border-gray-50">{farmer.group || '-'}</td>
+                      <td className="px-4 py-2 text-black border-gray-50">{farmer.chairman || '-'}</td>
+                      <td className="px-4 py-2 text-black border-gray-50">{farmer.members ? farmer.members.length : 0}</td>
+                      <td className="px-4 py-2 text-black border-gray-50">
+                        {farmer.createdAt ? new Date(farmer.createdAt).toLocaleDateString('id-ID') : '-'}
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -78,7 +185,7 @@ export default function DataPage() {
           </div>
         );
       default:
-        return <WaterLevelChart data={waterLevelData} />;
+        return <WaterLevelChart data={chartWaterData} />;
     }
   };
 
@@ -152,22 +259,18 @@ export default function DataPage() {
 
           {/* Tab Content */}
           <div className="min-h-80 pb-8">
-            {renderTabContent()}
+            {loading ? (
+              <div className="flex items-center justify-center h-64">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+              </div>
+            ) : error ? (
+              <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+                {error}
+              </div>
+            ) : (
+              renderTabContent()
+            )}
           </div>
-        </div>
-
-        {/* Features Information */}
-        <div className="bg-blue-50 rounded-lg p-8">
-          <h2 className="text-2xl font-semibold mb-4 text-blue-800">Fitur yang Tersedia</h2>
-          <ul className="list-disc list-inside text-gray-700 space-y-2">
-            <li>Bagan time series interaktif untuk level air dan curah hujan</li>
-            <li>Pembaruan data real-time (disimulasikan untuk demonstrasi)</li>
-            <li>Analisis data historis dan tren</li>
-            <li>Statistik produksi tanaman</li>
-            <li>Data dan statistik petani</li>
-            <li>Laporan produksi pertanian</li>
-            <li>Desain responsif untuk mobile dan desktop</li>
-          </ul>
         </div>
       </div>
     </div>

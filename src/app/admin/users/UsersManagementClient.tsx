@@ -8,12 +8,22 @@ interface User {
   id: string;
   name: string | null;
   email: string;
-  role: string;
+  roleId: string;
+  role?: {
+    id: string;
+    name: string;
+  };
   createdAt: string;
   updatedAt: string;
   _count?: {
     news: number;
   };
+}
+
+interface Role {
+  id: string;
+  name: string;
+  description: string | null;
 }
 
 export default function UsersManagementClient() {
@@ -24,11 +34,12 @@ export default function UsersManagementClient() {
   const [error, setError] = useState('');
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingUser, setEditingUser] = useState<User | null>(null);
+  const [roles, setRoles] = useState<Role[]>([]);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     password: '',
-    role: 'USER'
+    roleId: ''
   });
 
   useEffect(() => {
@@ -40,6 +51,7 @@ export default function UsersManagementClient() {
   useEffect(() => {
     if (status === 'authenticated') {
       fetchUsers();
+      fetchRoles();
     }
   }, [status]);
 
@@ -56,6 +68,20 @@ export default function UsersManagementClient() {
       setError('Error fetching users');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchRoles = async () => {
+    try {
+      const response = await fetch('/api/admin/roles');
+      if (response.ok) {
+        const data = await response.json();
+        setRoles(data);
+      } else {
+        console.error('Failed to fetch roles');
+      }
+    } catch (err) {
+      console.error('Error fetching roles:', err);
     }
   };
 
@@ -76,7 +102,7 @@ export default function UsersManagementClient() {
       if (response.ok) {
         setShowAddForm(false);
         setEditingUser(null);
-        setFormData({ name: '', email: '', password: '', role: 'USER' });
+        setFormData({ name: '', email: '', password: '', roleId: '' });
         fetchUsers(); // Refresh the list
       } else {
         const errorData = await response.json();
@@ -112,7 +138,7 @@ export default function UsersManagementClient() {
       name: user.name || '',
       email: user.email,
       password: '',
-      role: user.role
+      roleId: user.roleId
     });
     setShowAddForm(true);
   };
@@ -120,7 +146,7 @@ export default function UsersManagementClient() {
   const handleCancel = () => {
     setShowAddForm(false);
     setEditingUser(null);
-    setFormData({ name: '', email: '', password: '', role: 'USER' });
+    setFormData({ name: '', email: '', password: '', roleId: '' });
   };
 
   if (status === 'loading' || loading) {
@@ -155,7 +181,7 @@ export default function UsersManagementClient() {
 
         {showAddForm && (
           <div className="bg-white p-6 rounded-lg shadow-md mb-6">
-            <h2 className="text-xl font-semibold mb-4">
+            <h2 className="text-xl text-black font-semibold mb-4">
               {editingUser ? 'Edit Pengguna' : 'Tambah Pengguna Baru'}
             </h2>
             <form onSubmit={handleSubmit} className="space-y-4">
@@ -168,7 +194,7 @@ export default function UsersManagementClient() {
                   required
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 text-black border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
               <div>
@@ -180,7 +206,7 @@ export default function UsersManagementClient() {
                   required
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 text-black border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
               <div>
@@ -193,7 +219,7 @@ export default function UsersManagementClient() {
                   required={!editingUser}
                   value={formData.password}
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 text-black border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
                 {editingUser && (
                   <p className="text-sm text-gray-500 mt-1">
@@ -206,14 +232,24 @@ export default function UsersManagementClient() {
                   Peran
                 </label>
                 <select
-                  value={formData.role}
-                  onChange={(e) => setFormData({ ...formData, role: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  value={formData.roleId}
+                  onChange={(e) => setFormData({ ...formData, roleId: e.target.value })}
+                  className="w-full px-3 py-2 text-black border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  required
+                  disabled={editingUser?.role?.name === 'SUPER_ADMIN'}
                 >
-                  <option value="USER">User</option>
-                  <option value="ADMIN">Admin</option>
-                  <option value="SUPER_ADMIN">Super Admin</option>
+                  <option value="">Pilih Peran</option>
+                  {roles.map((role) => (
+                    <option key={role.id} value={role.id}>
+                      {role.name}
+                    </option>
+                  ))}
                 </select>
+                {editingUser?.role?.name === 'SUPER_ADMIN' && (
+                  <p className="text-sm text-gray-500 mt-1">
+                    Peran Super Admin tidak dapat diubah
+                  </p>
+                )}
               </div>
               <div className="flex space-x-3">
                 <button
@@ -270,14 +306,14 @@ export default function UsersManagementClient() {
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span
                       className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                        user.role === 'SUPER_ADMIN'
+                        user.role?.name === 'SUPER_ADMIN'
                           ? 'bg-purple-100 text-purple-800'
-                          : user.role === 'ADMIN'
+                          : user.role?.name === 'ADMIN'
                           ? 'bg-blue-100 text-blue-800'
                           : 'bg-gray-100 text-gray-800'
                       }`}
                     >
-                      {user.role.replace('_', ' ')}
+                      {user.role?.name || 'N/A'}
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
@@ -293,12 +329,14 @@ export default function UsersManagementClient() {
                     >
                       Edit
                     </button>
-                    <button
-                      onClick={() => handleDelete(user.id)}
-                      className="bg-red-600 text-white px-3 py-1 rounded text-xs hover:bg-red-700"
-                    >
-                      Hapus
-                    </button>
+                    {user.email !== 'su.admin@irigasibunta.com' && (
+                      <button
+                        onClick={() => handleDelete(user.id)}
+                        className="bg-red-600 text-white px-3 py-1 rounded text-xs hover:bg-red-700 cursor-pointer"
+                      >
+                        Hapus
+                      </button>
+                    )}
                   </td>
                 </tr>
               ))}

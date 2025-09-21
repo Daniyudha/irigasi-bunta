@@ -27,7 +27,7 @@ export default function ContactPage() {
   const onSubmit = async (data: ContactFormData) => {
     setIsSubmitting(true);
     setSubmitStatus('idle');
-    
+
     try {
       const response = await fetch('/api/contact', {
         method: 'POST',
@@ -43,7 +43,21 @@ export default function ContactPage() {
         setSubmitStatus('success');
         reset();
       } else {
-        const errorData = await response.json();
+        console.error('Response status:', response.status, response.statusText);
+        // Get the raw response text to see what the server is returning
+        const responseText = await response.text();
+        console.error('Raw server response:', responseText);
+        
+        let errorData = {};
+        try {
+          errorData = JSON.parse(responseText);
+        } catch (parseError) {
+          console.error('Failed to parse error response as JSON:', parseError);
+          errorData = {
+            error: `Server error: ${response.status} ${response.statusText}`,
+            rawResponse: responseText
+          };
+        }
         console.error('Form submission failed:', errorData);
         setSubmitStatus('error');
       }
@@ -72,7 +86,7 @@ export default function ContactPage() {
             Terima kasih atas pesan Anda! Kami akan segera menghubungi Anda kembali.
           </div>
         )}
-        
+
         {submitStatus === 'error' && (
           <div className="mb-6 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg">
             Terjadi kesalahan saat mengirim pesan Anda. Silakan coba lagi atau hubungi kami langsung.
@@ -83,14 +97,14 @@ export default function ContactPage() {
           {/* Contact Information */}
           <div>
             <h2 className="text-2xl font-semibold mb-6 text-gray-800">Informasi Kantor</h2>
-            
+
             <div className="space-y-6">
               <div>
                 <h3 className="text-lg font-semibold mb-2 text-blue-600">Alamat</h3>
                 <p className="text-gray-600">
-                  Gonohop, Simpang Raya, <br />
+                  Satuan Pemukiman B, Simpang Raya, <br />
                   Kabupaten Banggai, Sulawesi Tengah <br />
-                  Indonesia 
+                  Indonesia
                 </p>
               </div>
 
@@ -106,7 +120,10 @@ export default function ContactPage() {
               <div>
                 <h3 className="text-lg font-semibold mb-2 text-blue-600">Kontak Darurat</h3>
                 <p className="text-gray-600">
-                  Untuk masalah irigasi mendesak di luar jam kerja, silakan hubungi saluran darurat kami: irigasibunta@gmail.com
+                  Untuk masalah irigasi mendesak di luar jam kerja, silakan hubungi saluran darurat kami:
+                  <a target="_blank" href="https://wa.me/6289696862326" className="text-green-700 hover:text-green-500">
+                    +62 896-9686-2326 (Klik Chat Whatsapp)
+                  </a>
                 </p>
               </div>
 
@@ -124,7 +141,7 @@ export default function ContactPage() {
           {/* Contact Form */}
           <div>
             <h2 className="text-2xl font-semibold mb-6 text-gray-800">Kirim Pesan kepada Kami</h2>
-            
+
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
               <div>
                 <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
@@ -133,16 +150,15 @@ export default function ContactPage() {
                 <input
                   type="text"
                   id="name"
-                  {...register('name', { 
+                  {...register('name', {
                     required: 'Nama wajib diisi',
                     minLength: {
                       value: 2,
                       message: 'Nama minimal 2 karakter'
                     }
                   })}
-                  className={`w-full px-4 py-3 text-black border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                    errors.name ? 'border-red-300' : 'border-gray-300'
-                  }`}
+                  className={`w-full px-4 py-3 text-black border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.name ? 'border-red-300' : 'border-gray-300'
+                    }`}
                   placeholder="Masukkan nama lengkap Anda"
                 />
                 {errors.name && (
@@ -157,16 +173,15 @@ export default function ContactPage() {
                 <input
                   type="email"
                   id="email"
-                  {...register('email', { 
+                  {...register('email', {
                     required: 'Email wajib diisi',
                     pattern: {
                       value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
                       message: 'Alamat email tidak valid'
                     }
                   })}
-                  className={`w-full px-4 py-3 text-black border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                    errors.email ? 'border-red-300' : 'border-gray-300'
-                  }`}
+                  className={`w-full px-4 py-3 text-black border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.email ? 'border-red-300' : 'border-gray-300'
+                    }`}
                   placeholder="Masukkan alamat email Anda"
                 />
                 {errors.email && (
@@ -181,16 +196,15 @@ export default function ContactPage() {
                 <input
                   type="text"
                   id="subject"
-                  {...register('subject', { 
+                  {...register('subject', {
                     required: 'Subjek wajib diisi',
                     minLength: {
                       value: 5,
                       message: 'Subjek minimal 5 karakter'
                     }
                   })}
-                  className={`w-full px-4 py-3 text-black border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                    errors.subject ? 'border-red-300' : 'border-gray-300'
-                  }`}
+                  className={`w-full px-4 py-3 text-black border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.subject ? 'border-red-300' : 'border-gray-300'
+                    }`}
                   placeholder="Masukkan subjek pesan Anda"
                 />
                 {errors.subject && (
@@ -205,16 +219,15 @@ export default function ContactPage() {
                 <textarea
                   id="message"
                   rows={5}
-                  {...register('message', { 
+                  {...register('message', {
                     required: 'Pesan wajib diisi',
                     minLength: {
                       value: 10,
                       message: 'Pesan minimal 10 karakter'
                     }
                   })}
-                  className={`w-full px-4 py-3 text-black border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                    errors.message ? 'border-red-300' : 'border-gray-300'
-                  }`}
+                  className={`w-full px-4 py-3 text-black border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.message ? 'border-red-300' : 'border-gray-300'
+                    }`}
                   placeholder="Masukkan pesan Anda di sini..."
                 />
                 {errors.message && (
@@ -225,7 +238,7 @@ export default function ContactPage() {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full bg-blue-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-blue-700 disabled:bg-blue-400 disabled:cursor-not-allowed transition-colors flex items-center justify-center"
+                className="w-full bg-blue-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-blue-700 disabled:bg-blue-400 disabled:cursor-not-allowed transition-colors flex items-center justify-center cursor-pointer"
               >
                 {isSubmitting ? (
                   <>

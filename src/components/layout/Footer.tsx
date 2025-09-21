@@ -35,7 +35,7 @@ export default function Footer() {
                                 priority />
                         </div>
                         <p className="text-gray-300 mb-6 max-w-md">
-                            Kantor Pemantauan Irigasi Bunta menyediakan layanan informasi manajemen air
+                            Kantor Pengamatan Irigasi Bunta menyediakan layanan informasi manajemen air
                             dan irigasi yang komprehensif untuk petani dan pemangku kepentingan di wilayah tersebut.
                         </p>
 
@@ -43,7 +43,7 @@ export default function Footer() {
                         <div className="space-y-3">
                             <div className="flex items-center space-x-3">
                                 <MapPin className="w-5 h-5 text-blue-400 flex-shrink-0" />
-                                <span className="text-gray-300">Gonohop, Simpang Raya, Kabupaten Banggai, Sulawesi Tengah</span>
+                                <span className="text-gray-300">Bunta - Simpang Raya, Kabupaten Banggai, Sulawesi Tengah</span>
                             </div>
                             <div className="flex items-center space-x-3">
                                 <Phone className="w-5 h-5 text-blue-400 flex-shrink-0" />
@@ -108,7 +108,7 @@ export default function Footer() {
                 {/* Bottom Section */}
                 <div className="border-t border-gray-700 mt-8 pt-8 flex flex-col md:flex-row justify-between items-center">
                     <p className="text-gray-400 text-sm">
-                        © {new Date().getFullYear()} Kantor Pemantauan Irigasi Bunta. Hak cipta dilindungi.
+                        © {new Date().getFullYear()} Kantor Pengamatan Irigasi Bunta. Hak cipta dilindungi.
                     </p>
                     <p className="text-gray-400 text-sm">Didukung oleh <span><a className="text-lg font-bold text-blue-400 hover:text-blue-300" href="https://www.gegacreative.com/" target='_blank'>Gega Creative</a></span></p>
 

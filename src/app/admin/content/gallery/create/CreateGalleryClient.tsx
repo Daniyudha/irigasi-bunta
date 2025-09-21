@@ -1,8 +1,9 @@
 'use client';
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
+import { galleryCategories } from '@/types/gallery';
 
 export default function CreateGalleryClient() {
   const { data: session, status } = useSession();
@@ -11,6 +12,7 @@ export default function CreateGalleryClient() {
   const [error, setError] = useState('');
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [videoPreviewUrl, setVideoPreviewUrl] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [formData, setFormData] = useState({
@@ -36,28 +38,47 @@ export default function CreateGalleryClient() {
       ...prev,
       [name]: type === 'checkbox' ? (e.target as HTMLInputElement).checked : value,
     }));
+  };
 
-    // Handle YouTube URL preview for videos
-    if (name === 'imageUrl' && formData.type === 'video') {
-      const youtubeId = extractYoutubeId(value);
+  // Handle video preview when imageUrl changes for videos
+  useEffect(() => {
+    if (formData.type === 'video' && formData.imageUrl) {
+      const youtubeId = extractYoutubeId(formData.imageUrl);
       if (youtubeId) {
         setVideoPreviewUrl(`https://www.youtube.com/embed/${youtubeId}`);
       } else {
         setVideoPreviewUrl(null);
       }
+    } else if (formData.type === 'image') {
+      setVideoPreviewUrl(null);
     }
-  };
+  }, [formData.imageUrl, formData.type]);
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file && file.type.startsWith('image/')) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const result = e.target?.result as string;
-        setImagePreview(result);
-        setFormData(prev => ({ ...prev, imageUrl: result }));
-      };
-      reader.readAsDataURL(file);
+      setUploading(true);
+      try {
+        const formData = new FormData();
+        formData.append('file', file);
+
+        const response = await fetch('/api/admin/media', {
+          method: 'POST',
+          body: formData,
+        });
+
+        if (response.ok) {
+          const media = await response.json();
+          setImagePreview(media.url);
+          setFormData(prev => ({ ...prev, imageUrl: media.url }));
+        } else {
+          setError('Failed to upload image');
+        }
+      } catch (err) {
+        setError('Error uploading image');
+      } finally {
+        setUploading(false);
+      }
     }
   };
 
@@ -72,56 +93,25 @@ export default function CreateGalleryClient() {
     setLoading(true);
     setError('');
 
-    // For images, we need to handle the file upload separately
-    if (formData.type === 'image' && imagePreview) {
-      // In a real application, you would upload the image to a server here
-      // and get the URL. For now, we'll use the data URL directly.
-      // Note: Data URLs are not ideal for production, consider using a proper file upload API
-      try {
-        const response = await fetch('/api/admin/gallery', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            ...formData,
-            imageUrl: imagePreview, // This should be replaced with actual uploaded URL
-          }),
-        });
+    try {
+      const response = await fetch('/api/admin/gallery', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
 
-        if (response.ok) {
-          router.push('/admin/content/gallery');
-        } else {
-          const errorData = await response.json();
-          setError(errorData.message || 'Failed to create gallery item');
-        }
-      } catch (err) {
-        setError('Error creating gallery item');
-      } finally {
-        setLoading(false);
+      if (response.ok) {
+        router.push('/admin/content/gallery');
+      } else {
+        const errorData = await response.json();
+        setError(errorData.message || 'Failed to create gallery item');
       }
-    } else {
-      // For videos or if no image uploaded
-      try {
-        const response = await fetch('/api/admin/gallery', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(formData),
-        });
-
-        if (response.ok) {
-          router.push('/admin/content/gallery');
-        } else {
-          const errorData = await response.json();
-          setError(errorData.message || 'Failed to create gallery item');
-        }
-      } catch (err) {
-        setError('Error creating gallery item');
-      } finally {
-        setLoading(false);
-      }
+    } catch (err) {
+      setError('Error creating gallery item');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -160,7 +150,7 @@ export default function CreateGalleryClient() {
                 value={formData.title}
                 onChange={handleInputChange}
                 required
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 text-black border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Enter gallery item title"
               />
             </div>
@@ -175,9 +165,26 @@ export default function CreateGalleryClient() {
                 value={formData.description}
                 onChange={handleInputChange}
                 rows={3}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 text-black border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Description of the gallery item"
               />
+            </div>
+
+            <div>
+              <label htmlFor="type" className="block text-sm font-medium text-gray-700 mb-2">
+                Type *
+              </label>
+              <select
+                id="type"
+                name="type"
+                value={formData.type}
+                onChange={handleInputChange}
+                required
+                className="w-full px-3 py-2 text-black border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="image">Image</option>
+                <option value="video">Video</option>
+              </select>
             </div>
 
             {/* Conditional rendering based on media type */}
@@ -192,9 +199,13 @@ export default function CreateGalleryClient() {
                   ref={fileInputRef}
                   accept="image/*"
                   onChange={handleImageUpload}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full text-black border border-gray-300 file:py-2 file:px-3 file:bg-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   required={formData.type === 'image'}
+                  disabled={uploading}
                 />
+                {uploading && (
+                  <p className="text-sm text-blue-600 mt-2">Uploading image...</p>
+                )}
                 {imagePreview && (
                   <div className="mt-4">
                     <p className="text-sm text-gray-600 mb-2">Image Preview:</p>
@@ -218,7 +229,7 @@ export default function CreateGalleryClient() {
                   value={formData.imageUrl}
                   onChange={handleInputChange}
                   required={formData.type === 'video'}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 text-black border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder="https://www.youtube.com/watch?v=..."
                 />
                 {videoPreviewUrl && (
@@ -242,32 +253,22 @@ export default function CreateGalleryClient() {
               <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-2">
                 Category *
               </label>
-              <input
-                type="text"
+              <select
                 id="category"
                 name="category"
                 value={formData.category}
                 onChange={handleInputChange}
                 required
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="e.g., Events, Infrastructure, People"
-              />
-            </div>
-
-            <div>
-              <label htmlFor="type" className="block text-sm font-medium text-gray-700 mb-2">
-                Type *
-              </label>
-              <select
-                id="type"
-                name="type"
-                value={formData.type}
-                onChange={handleInputChange}
-                required
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 text-black border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
-                <option value="image">Image</option>
-                <option value="video">Video</option>
+                <option value="">Select a category</option>
+                {galleryCategories
+                  .filter(category => category !== 'All')
+                  .map((category) => (
+                    <option key={category} value={category}>
+                      {category}
+                    </option>
+                  ))}
               </select>
             </div>
 
@@ -290,14 +291,14 @@ export default function CreateGalleryClient() {
             <button
               type="button"
               onClick={() => router.back()}
-              className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
+              className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-black hover:bg-gray-100"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={loading}
-              className="px-4 py-2 bg-blue-600 text-white rounded-md text-sm font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-4 py-2 bg-blue-500 text-white rounded-md text-sm font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? 'Creating...' : 'Create Gallery Item'}
             </button>

@@ -19,9 +19,16 @@ export async function GET(
     // Only allow ADMIN or SUPER_ADMIN to access user details
     const currentUser = await prisma.user.findUnique({
       where: { email: session.user?.email || '' },
+      include: {
+        role: {
+          include: {
+            permissions: true,
+          },
+        },
+      },
     });
 
-    if (!currentUser || (currentUser.role !== 'ADMIN' && currentUser.role !== 'SUPER_ADMIN')) {
+    if (!currentUser || !currentUser.role || (currentUser.role.name !== 'ADMIN' && currentUser.role.name !== 'SUPER_ADMIN')) {
       return NextResponse.json({ message: 'Forbidden' }, { status: 403 });
     }
 
@@ -31,7 +38,13 @@ export async function GET(
         id: true,
         name: true,
         email: true,
-        role: true,
+        roleId: true,
+        role: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
         createdAt: true,
         updatedAt: true,
       },
@@ -66,14 +79,21 @@ export async function PATCH(
     // Only allow SUPER_ADMIN to update users
     const currentUser = await prisma.user.findUnique({
       where: { email: session.user?.email || '' },
+      include: {
+        role: {
+          include: {
+            permissions: true,
+          },
+        },
+      },
     });
 
-    if (!currentUser || currentUser.role !== 'SUPER_ADMIN') {
+    if (!currentUser || !currentUser.role || currentUser.role.name !== 'SUPER_ADMIN') {
       return NextResponse.json({ message: 'Forbidden' }, { status: 403 });
     }
 
     const body = await request.json();
-    const { name, email, password, role } = body;
+    const { name, email, password, roleId } = body;
 
     // Check if user exists
     const existingUser = await prisma.user.findUnique({
@@ -82,6 +102,22 @@ export async function PATCH(
 
     if (!existingUser) {
       return NextResponse.json({ message: 'User not found' }, { status: 404 });
+    }
+
+    // Prevent modification of Super Admin account's email and role
+    if (existingUser.email === 'su.admin@irigasibunta.com') {
+      if (email && email !== existingUser.email) {
+        return NextResponse.json(
+          { message: 'Cannot change Super Admin account email' },
+          { status: 400 }
+        );
+      }
+      if (roleId && roleId !== existingUser.roleId) {
+        return NextResponse.json(
+          { message: 'Cannot change Super Admin account role' },
+          { status: 400 }
+        );
+      }
     }
 
     // Check if email is being changed and if it already exists
@@ -109,13 +145,19 @@ export async function PATCH(
         name: name ?? existingUser.name,
         email: email ?? existingUser.email,
         password: hashedPassword ?? existingUser.password,
-        role: role ?? existingUser.role,
+        roleId: roleId ?? existingUser.roleId,
       },
       select: {
         id: true,
         name: true,
         email: true,
-        role: true,
+        roleId: true,
+        role: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
         createdAt: true,
         updatedAt: true,
       },
@@ -146,9 +188,16 @@ export async function DELETE(
     // Only allow SUPER_ADMIN to delete users
     const currentUser = await prisma.user.findUnique({
       where: { email: session.user?.email || '' },
+      include: {
+        role: {
+          include: {
+            permissions: true,
+          },
+        },
+      },
     });
 
-    if (!currentUser || currentUser.role !== 'SUPER_ADMIN') {
+    if (!currentUser || !currentUser.role || currentUser.role.name !== 'SUPER_ADMIN') {
       return NextResponse.json({ message: 'Forbidden' }, { status: 403 });
     }
 
@@ -165,6 +214,14 @@ export async function DELETE(
     if (existingUser.id === currentUser.id) {
       return NextResponse.json(
         { message: 'Cannot delete your own account' },
+        { status: 400 }
+      );
+    }
+
+    // Prevent deletion of Super Admin account
+    if (existingUser.email === 'su.admin@irigasibunta.com') {
+      return NextResponse.json(
+        { message: 'Cannot delete Super Admin account' },
         { status: 400 }
       );
     }

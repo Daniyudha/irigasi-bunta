@@ -1,9 +1,10 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
+import { Search, X } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
 
@@ -11,6 +12,7 @@ interface News {
   id: string;
   title: string;
   slug: string;
+  image: string | null;
   published: boolean;
   publishedAt: string | null;
   createdAt: string;
@@ -24,7 +26,14 @@ export default function NewsManagementClient() {
   const router = useRouter();
   const [news, setNews] = useState<News[]>([]);
   const [loading, setLoading] = useState(true);
+  const [tableLoading, setTableLoading] = useState(false);
   const [error, setError] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(10);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
+  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState(searchQuery);
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -38,19 +47,66 @@ export default function NewsManagementClient() {
     }
   }, [status]);
 
-  const fetchNews = async () => {
+  // Debounce search input
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearchQuery(searchQuery);
+    }, 500); // 500ms debounce
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [searchQuery]);
+
+  // Fetch news when debounced search query or page changes
+  useEffect(() => {
+    if (status === 'authenticated') {
+      fetchNews(currentPage, debouncedSearchQuery);
+    }
+  }, [debouncedSearchQuery, currentPage, status]);
+
+  const fetchNews = useCallback(async (page = currentPage, query = debouncedSearchQuery) => {
     try {
-      const response = await fetch('/api/admin/news');
+      setTableLoading(true);
+      setError('');
+      const url = new URL('/api/admin/news', window.location.origin);
+      url.searchParams.append('page', page.toString());
+      url.searchParams.append('limit', itemsPerPage.toString());
+      if (query) {
+        url.searchParams.append('search', query);
+      }
+
+      const response = await fetch(url.toString());
       if (response.ok) {
         const data = await response.json();
-        setNews(data);
+        setNews(data.news || []);
+        setTotalPages(data.totalPages || 1);
+        setTotalItems(data.totalCount || 0);
       } else {
-        setError('Failed to fetch news');
+        const errorData = await response.json().catch(() => ({}));
+        setError(errorData.message || 'Failed to fetch news');
       }
     } catch (err) {
-      setError('Error fetching news');
+      setError('Network error: Unable to fetch news');
     } finally {
+      setTableLoading(false);
       setLoading(false);
+    }
+  }, [currentPage, itemsPerPage, debouncedSearchQuery]);
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
+    setCurrentPage(1);
+  };
+
+  const clearSearch = () => {
+    setSearchQuery('');
+    setCurrentPage(1);
+  };
+
+  const handlePageChange = (newPage: number) => {
+    if (newPage >= 1 && newPage <= totalPages) {
+      setCurrentPage(newPage);
     }
   };
 
@@ -101,8 +157,8 @@ export default function NewsManagementClient() {
   }
 
   return (
-    <div className="min-h-screen py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen">
+      <div className="max-w-7xl mx-auto">
         <div className="mb-8 flex justify-between items-center">
           <div>
             <h1 className="text-3xl font-bold text-gray-800">News Management</h1>
@@ -112,7 +168,7 @@ export default function NewsManagementClient() {
             href="/admin/content/news/create"
             className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors"
           >
-            Add New Article
+            Tambah Berita Baru
           </Link>
         </div>
 
@@ -123,29 +179,85 @@ export default function NewsManagementClient() {
         )}
 
         <div className="bg-white shadow overflow-hidden sm:rounded-lg">
+          <div className="flex items-center justify-between mx-3">
+            {/* Results Info */}
+            <div className="px-6 py-4 ">
+              <p className="text-sm text-gray-600">
+                Showing {(currentPage - 1) * itemsPerPage + 1} to {Math.min(currentPage * itemsPerPage, totalItems)} of {totalItems} results
+                {searchQuery && (
+                  <span> for &ldquo;<strong>{searchQuery}</strong>&rdquo;</span>
+                )}
+              </p>
+            </div>
+            {/* Search Form */}
+            <div className="px-6 py-4 md:w-1/3">
+              <div className="bg-white rounded-lg border border-gray-300">
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <Search className="h-5 w-5 text-gray-400" />
+                  </div>
+                  <input
+                    type="text"
+                    placeholder="Search news by title, slug, or content..."
+                    value={searchQuery}
+                    onChange={handleSearchChange}
+                    className="block w-full text-black pl-10 pr-12 py-2 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                  {searchQuery && (
+                    <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
+                      <button
+                        type="button"
+                        onClick={clearSearch}
+                        className="text-gray-400 hover:text-gray-600 transition-colors"
+                      >
+                        <X className="h-4 w-4" />
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Title
+                  Gambar
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Category
+                  Judul
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Kategori
                 </th>
                 <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Status
                 </th>
                 <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Created
+                  Dibuat
                 </th>
                 <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Actions
+                  Aksi
                 </th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {news.map((item) => (
                 <tr key={item.id}>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    {item.image ? (
+                      <img
+                        src={item.image}
+                        alt={item.title}
+                        className="w-16 h-16 object-cover rounded-md"
+                      />
+                    ) : (
+                      <div className="w-16 h-16 bg-gray-200 rounded-md flex items-center justify-center">
+                        <span className="text-xs text-gray-500">No Image</span>
+                      </div>
+                    )}
+                  </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm font-medium text-gray-900">{item.title}</div>
                     <div className="text-sm text-gray-500">{item.slug}</div>
@@ -155,11 +267,10 @@ export default function NewsManagementClient() {
                   </td>
                   <td className="px-6 py-4 text-center whitespace-nowrap">
                     <span
-                      className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                        item.published
-                          ? 'bg-green-100 text-green-800'
-                          : 'bg-gray-100 text-gray-800'
-                      }`}
+                      className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${item.published
+                        ? 'bg-green-100 text-green-800'
+                        : 'bg-gray-100 text-gray-800'
+                        }`}
                     >
                       {item.published ? 'Published' : 'Draft'}
                     </span>
@@ -170,25 +281,24 @@ export default function NewsManagementClient() {
                   <td className="px-6 py-4 whitespace-nowrap text-center text-sm font-medium space-x-2">
                     <button
                       onClick={() => handlePublish(item.id, !item.published)}
-                      className={`${
-                        item.published
-                          ? 'bg-yellow-600 hover:bg-yellow-700'
-                          : 'bg-green-600 hover:bg-green-700'
-                      } text-white px-3 py-1 rounded text-xs`}
+                      className={`${item.published
+                        ? 'bg-yellow-600 hover:bg-yellow-700'
+                        : 'bg-green-600 hover:bg-green-700'
+                        } text-white px-3 py-1 rounded text-xs cursor-pointer`}
                     >
                       {item.published ? 'Unpublish' : 'Publish'}
                     </button>
                     <Link
                       href={`/admin/content/news/edit/${item.id}`}
-                      className="bg-blue-600 text-white px-3 py-1 rounded text-xs hover:bg-blue-700"
+                      className="bg-blue-600 text-white px-3 py-1 rounded text-xs hover:bg-blue-700 cursor-pointer"
                     >
-                      Edit
+                      Ubah
                     </Link>
                     <button
                       onClick={() => handleDelete(item.id)}
-                      className="bg-red-600 text-white px-3 py-1 rounded text-xs hover:red-700"
+                      className="bg-red-600 text-white px-3 py-1 rounded text-xs hover:red-700 cursor-pointer"
                     >
-                      Delete
+                      Hapus
                     </button>
                   </td>
                 </tr>
@@ -197,7 +307,46 @@ export default function NewsManagementClient() {
           </table>
           {news.length === 0 && !loading && (
             <div className="text-center py-8 text-gray-500">
-              No news articles found. Create your first article!
+              {searchQuery ? 'No news articles found matching your search.' : 'No news articles found. Create your first article!'}
+            </div>
+          )}
+
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-700">
+                  Page {currentPage} of {totalPages}
+                </p>
+              </div>
+              <div className="flex space-x-2">
+                <button
+                  onClick={() => handlePageChange(currentPage - 1)}
+                  disabled={currentPage === 1}
+                  className="px-3 py-1 text-sm text-black cursor-pointer bg-gray-200 rounded-md disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-300"
+                >
+                  Previous
+                </button>
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+                  <button
+                    key={page}
+                    onClick={() => handlePageChange(page)}
+                    className={`px-3 py-1 text-sm rounded-md ${currentPage === page
+                      ? 'bg-blue-600 text-white'
+                      : 'bg-gray-200 text-gray-700 hover:bg-gray-300 cursor-pointer'
+                      }`}
+                  >
+                    {page}
+                  </button>
+                ))}
+                <button
+                  onClick={() => handlePageChange(currentPage + 1)}
+                  disabled={currentPage === totalPages}
+                  className="px-3 py-1 text-black cursor-pointer text-sm bg-gray-200 rounded-md disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-300"
+                >
+                  Next
+                </button>
+              </div>
             </div>
           )}
         </div>

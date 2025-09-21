@@ -8,10 +8,11 @@ import Link from 'next/link';
 interface Slider {
   id: string;
   title: string;
-  description: string | null;
-  imageUrl: string;
-  linkUrl: string | null;
-  isActive: boolean;
+  subtitle: string | null;
+  image: string;
+  link: string | null;
+  buttonText: string | null;
+  active: boolean;
   order: number;
   createdAt: string;
   updatedAt: string;
@@ -28,7 +29,7 @@ export default function SlidersManagementPage() {
     if (status === 'loading') return;
 
     if (!session || session.user.role !== 'ADMIN') {
-      router.push('/admin/login');
+      router.push('/login');
       return;
     }
 
@@ -72,11 +73,11 @@ export default function SlidersManagementPage() {
   const toggleActive = async (id: string, currentStatus: boolean) => {
     try {
       const response = await fetch(`/api/admin/sliders/${id}`, {
-        method: 'PATCH',
+        method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ isActive: !currentStatus }),
+        body: JSON.stringify({ active: !currentStatus }),
       });
 
       if (!response.ok) {
@@ -101,7 +102,7 @@ export default function SlidersManagementPage() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold text-gray-800">Sliders Management</h1>
         <Link
@@ -129,7 +130,7 @@ export default function SlidersManagementPage() {
                 Title
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Description
+                Subtitle
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Link
@@ -150,7 +151,7 @@ export default function SlidersManagementPage() {
               <tr key={slider.id}>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <img
-                    src={slider.imageUrl}
+                    src={slider.image}
                     alt={slider.title}
                     className="h-16 w-24 object-cover rounded"
                   />
@@ -159,12 +160,12 @@ export default function SlidersManagementPage() {
                   {slider.title}
                 </td>
                 <td className="px-6 py-4 text-sm text-gray-500">
-                  {slider.description || 'No description'}
+                  {slider.subtitle || 'No subtitle'}
                 </td>
                 <td className="px-6 py-4 text-sm text-gray-500">
-                  {slider.linkUrl ? (
+                  {slider.link ? (
                     <a
-                      href={slider.linkUrl}
+                      href={slider.link}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-blue-600 hover:text-blue-800"
@@ -180,14 +181,14 @@ export default function SlidersManagementPage() {
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <button
-                    onClick={() => toggleActive(slider.id, slider.isActive)}
+                    onClick={() => toggleActive(slider.id, slider.active)}
                     className={`px-3 py-1 rounded-full text-xs font-medium ${
-                      slider.isActive
+                      slider.active
                         ? 'bg-green-100 text-green-800'
                         : 'bg-red-100 text-red-800'
                     }`}
                   >
-                    {slider.isActive ? 'Active' : 'Inactive'}
+                    {slider.active ? 'Active' : 'Inactive'}
                   </button>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">

@@ -3,6 +3,7 @@
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { redirect } from 'next/navigation';
+import { prisma } from '@/lib/prisma';
 
 export default async function AdminDashboard() {
   const session = await getServerSession(authOptions);
@@ -11,12 +12,30 @@ export default async function AdminDashboard() {
     redirect('/login');
   }
 
-  // Mock data for demonstration
+  // Fetch real data from database
+  const [newsCount, userCount, galleryCount, rainfallCount, waterLevelCount, cropCount, farmerCount] = await Promise.all([
+    prisma.news.count(),
+    prisma.user.count(),
+    prisma.gallery.count(),
+    prisma.rainfallData.count(),
+    prisma.waterLevelData.count(),
+    prisma.cropData.count(),
+    prisma.farmerData.count()
+  ]);
+
+  const totalContacts = 0;
+  const unreadCount = 0;
+
+  const dataEntriesCount = rainfallCount + waterLevelCount + cropCount + farmerCount;
+
+  // Real data for dashboard
   const stats = {
-    totalVisitors: 1250,
-    newsArticles: 45,
-    pendingMessages: 3,
-    activeUsers: 12
+    totalContacts,
+    newsArticles: newsCount,
+    pendingMessages: unreadCount,
+    activeUsers: userCount,
+    galleryItems: galleryCount,
+    dataEntries: dataEntriesCount
   };
 
   const recentActivity = [
@@ -51,15 +70,15 @@ export default async function AdminDashboard() {
       </div>
 
       {/* Quick Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
           <div className="flex items-center">
             <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mr-4">
-              <span className="text-2xl">👥</span>
+              <span className="text-2xl">✉️</span>
             </div>
             <div>
-              <div className="text-2xl font-bold text-blue-600">{stats.totalVisitors.toLocaleString()}</div>
-              <div className="text-sm text-gray-600">Total Pengunjung</div>
+              <div className="text-2xl font-bold text-blue-600">{stats.totalContacts.toLocaleString()}</div>
+              <div className="text-sm text-gray-600">Total Kontak</div>
             </div>
           </div>
         </div>
@@ -99,6 +118,30 @@ export default async function AdminDashboard() {
             </div>
           </div>
         </div>
+
+        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+          <div className="flex items-center">
+            <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mr-4">
+              <span className="text-2xl">🖼️</span>
+            </div>
+            <div>
+              <div className="text-2xl font-bold text-green-600">{stats.galleryItems}</div>
+              <div className="text-sm text-gray-600">Item Galeri</div>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+          <div className="flex items-center">
+            <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center mr-4">
+              <span className="text-2xl">📊</span>
+            </div>
+            <div>
+              <div className="text-2xl font-bold text-orange-600">{stats.dataEntries}</div>
+              <div className="text-sm text-gray-600">Entri Data</div>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Main Content Grid */}
@@ -108,7 +151,7 @@ export default async function AdminDashboard() {
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
             <h2 className="text-xl font-semibold mb-4 text-gray-800">Aksi Cepat</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <button className="flex items-center p-4 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors">
+              <a href="/admin/content/news/create" className="flex items-center p-4 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors">
                 <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center mr-3">
                   <span className="text-white">📝</span>
                 </div>
@@ -116,9 +159,9 @@ export default async function AdminDashboard() {
                   <div className="font-medium text-blue-800">Buat Berita</div>
                   <div className="text-sm text-blue-600">Terbitkan artikel baru</div>
                 </div>
-              </button>
+              </a>
 
-              <button className="flex items-center p-4 bg-green-50 rounded-lg hover:bg-green-100 transition-colors">
+              <a href="/admin/data/input" className="flex items-center p-4 bg-green-50 rounded-lg hover:bg-green-100 transition-colors">
                 <div className="w-10 h-10 bg-green-600 rounded-lg flex items-center justify-center mr-3">
                   <span className="text-white">💧</span>
                 </div>
@@ -126,27 +169,27 @@ export default async function AdminDashboard() {
                   <div className="font-medium text-green-800">Input Data</div>
                   <div className="text-sm text-green-600">Data ketinggian air</div>
                 </div>
-              </button>
+              </a>
 
-              <button className="flex items-center p-4 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors">
+              <a href="/admin/contact-submissions" className="flex items-center p-4 bg-yellow-50 rounded-lg hover:bg-yellow-100 transition-colors">
+                <div className="w-10 h-10 bg-yellow-600 rounded-lg flex items-center justify-center mr-3">
+                  <span className="text-white">✉️</span>
+                </div>
+                <div className="text-left">
+                  <div className="font-medium text-yellow-800">Pesan Kontak</div>
+                  <div className="text-sm text-yellow-600">Kelola submission</div>
+                </div>
+              </a>
+
+              <a href="/admin/content/gallery/create" className="flex items-center p-4 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors">
                 <div className="w-10 h-10 bg-purple-600 rounded-lg flex items-center justify-center mr-3">
-                  <span className="text-white">📊</span>
+                  <span className="text-white">🖼️</span>
                 </div>
                 <div className="text-left">
-                  <div className="font-medium text-purple-800">Lihat Statistik</div>
-                  <div className="text-sm text-purple-600">Dashboard analitik</div>
+                  <div className="font-medium text-purple-800">Tambah Galeri</div>
+                  <div className="text-sm text-purple-600">Upload gambar baru</div>
                 </div>
-              </button>
-
-              <button className="flex items-center p-4 bg-orange-50 rounded-lg hover:bg-orange-100 transition-colors">
-                <div className="w-10 h-10 bg-orange-600 rounded-lg flex items-center justify-center mr-3">
-                  <span className="text-white">⚙️</span>
-                </div>
-                <div className="text-left">
-                  <div className="font-medium text-orange-800">Pengaturan</div>
-                  <div className="text-sm text-orange-600">Konfigurasi sistem</div>
-                </div>
-              </button>
+              </a>
             </div>
           </div>
 
@@ -206,7 +249,7 @@ export default async function AdminDashboard() {
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-gray-600">Penyimpanan</span>
-                <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">2.3GB/10GB</span>
+                <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">2.3GB/1000GB</span>
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-gray-600">Backup Terakhir</span>
@@ -218,9 +261,6 @@ export default async function AdminDashboard() {
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
             <h2 className="text-xl font-semibold mb-4 text-gray-800">Tautan Cepat</h2>
             <div className="space-y-2">
-              <button className="w-full text-left p-3 text-black bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-                Lihat Situs Publik
-              </button>
               <button className="w-full text-left p-3 text-black bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
                 Dokumentasi
               </button>

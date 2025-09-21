@@ -20,7 +20,7 @@ interface DynamicMapProps {
 }
 
 export default function DynamicMap({ areas, onAreaSelect }: DynamicMapProps) {
-  const center: [number, number] = [-1.423, 121.646]; // Center between Bunta and Bunta
+  const center: [number, number] = [-0.9136959956309897, 122.29245556083764]; // Center between Bunta and Bunta
 
   const getStatusColor = (status: IrrigationArea['status']) => {
     switch (status) {

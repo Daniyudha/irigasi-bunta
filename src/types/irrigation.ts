@@ -16,7 +16,7 @@ export const irrigationAreas: IrrigationArea[] = [
     id: 'bunta',
     name: 'Bunta Irrigation Area',
     description: 'Serves agricultural lands with efficient water distribution systems in Bunta District.',
-    coordinates: [-1.3891, 121.6139], // Approximate coordinates for Bunta, Central Sulawesi
+    coordinates: [-0.9136959956309897, 122.29245556083764], // Approximate coordinates for Bunta, Central Sulawesi
     area: 2.481,
     waterLevel: 2.1,
     status: 'normal',
