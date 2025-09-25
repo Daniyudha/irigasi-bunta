@@ -29,24 +29,22 @@ npx prisma generate
 npx prisma migrate deploy
 ```
 
-### 4. Seed the Database
+### 4. Seed the Database (All-in-One)
 ```bash
 npm run seed
 ```
 
-### 5. Run Additional Seed Scripts (if available)
+This single command now seeds:
+- All system permissions
+- SUPER_ADMIN and ADMIN roles with full permissions
+- Super Admin user (su.admin@irigasibunta.com / Buntamengalir25!)
+- Admin user (admin@buntabella.go.id / admin123)
+- Default categories
+
+### 5. Optional: Verify Data (if needed)
 ```bash
-# Seed categories
-node scripts/seed-categories.js
-
-# Update news categories  
-node scripts/update-news-categories.js
-
-# Check data
+# Check data consistency
 node scripts/check-data.js
-
-# Check permissions count
-node scripts/check-permissions-simple.js
 ```
 
 ### 6. Build the Application

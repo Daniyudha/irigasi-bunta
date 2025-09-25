@@ -7,7 +7,7 @@
     "build": "next build --turbopack",
     "start": "next start",
     "lint": "eslint",
-    "seed": "node scripts/seed.js",
+    "seed": "node scripts/seed-all-in-one.js",
     "seed:categories": "node scripts/seed-categories.js",
     "seed:news-categories": "node scripts/update-news-categories.js",
     "check:data": "node scripts/check-data.js",
