@@ -76,8 +76,17 @@ export async function middleware(request: NextRequest) {
     secret: process.env.NEXTAUTH_SECRET
   });
 
-  // If no token, redirect to login
+  // If no token, handle differently for API routes vs UI routes
   if (!token) {
+    // For API routes, return 401 instead of redirect
+    if (pathname.startsWith('/api/')) {
+      return NextResponse.json(
+        { error: 'Unauthorized' },
+        { status: 401 }
+      );
+    }
+    
+    // For UI routes, redirect to login
     const loginUrl = new URL('/login', request.url);
     loginUrl.searchParams.set('callbackUrl', request.url);
     return NextResponse.redirect(loginUrl);
@@ -121,11 +130,25 @@ export async function middleware(request: NextRequest) {
       requestHeaders.set('x-user-id', token.sub || '');
       requestHeaders.set('x-user-role', userRole);
       
+      // Handle CORS for API routes, especially for file uploads
+      if (request.method === 'OPTIONS') {
+        const response = new NextResponse(null, { status: 200 });
+        response.headers.set('Access-Control-Allow-Origin', '*');
+        response.headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+        response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization, x-user-id, x-user-role');
+        return response;
+      }
+      
       const response = NextResponse.next({
         request: {
           headers: requestHeaders,
         },
       });
+      
+      // Add CORS headers for all API responses
+      response.headers.set('Access-Control-Allow-Origin', '*');
+      response.headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+      response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization, x-user-id, x-user-role');
       
       return response;
     }

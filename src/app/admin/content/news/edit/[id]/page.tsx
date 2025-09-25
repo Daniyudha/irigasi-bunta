@@ -89,10 +89,12 @@ export default function EditNews() {
       const response = await fetch('/api/admin/categories');
       if (response.ok) {
         const data = await response.json();
-        setCategories(data);
+        // The API returns { data: categories[], pagination: {...} }
+        setCategories(data.data || []);
       }
     } catch (err) {
       console.error('Error fetching categories:', err);
+      setCategories([]);
     }
   };
 

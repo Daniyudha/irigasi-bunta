@@ -24,6 +24,7 @@ class MyUploadAdapter {
                 fetch(this.apiUrl, {
                     method: 'POST',
                     body: formData,
+                    credentials: 'include',
                 })
                 .then(res => {
                     console.log('CKEditor upload response status:', res.status, res.statusText);
