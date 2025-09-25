@@ -5,7 +5,7 @@ import { prisma } from '@/lib/prisma';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -30,7 +30,7 @@ export async function GET(
       return NextResponse.json({ message: 'Forbidden' }, { status: 403 });
     }
 
-    const { id } = params;
+    const { id } = await context.params;
 
     const slider = await prisma.slider.findUnique({
       where: { id },
@@ -52,7 +52,7 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -77,7 +77,7 @@ export async function PUT(
       return NextResponse.json({ message: 'Forbidden' }, { status: 403 });
     }
 
-    const { id } = params;
+    const { id } = await context.params;
     const contentType = request.headers.get('content-type') || '';
     
     if (contentType.includes('multipart/form-data')) {
@@ -127,7 +127,15 @@ export async function PUT(
       }
 
       // Update slider with new data
-      const updateData: any = {
+      const updateData: {
+        title: string;
+        subtitle: string | null;
+        link: string | null;
+        buttonText: string;
+        order: number;
+        active: boolean;
+        image?: string;
+      } = {
         title,
         subtitle: subtitle || null,
         link: link || null,
@@ -189,7 +197,7 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -214,7 +222,7 @@ export async function DELETE(
       return NextResponse.json({ message: 'Forbidden' }, { status: 403 });
     }
 
-    const { id } = params;
+    const { id } = await context.params;
 
     await prisma.slider.delete({
       where: { id },

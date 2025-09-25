@@ -25,13 +25,16 @@ export default function WaterLevelChart({ data }: WaterLevelChartProps) {
   // Group data by date for the chart - create an object for each date with values for each area
   const dateGroups = data.reduce((acc, item) => {
     if (!acc[item.date]) {
-      acc[item.date] = { date: item.date };
+      acc[item.date] = {};
     }
     acc[item.date][item.area] = item.level;
     return acc;
-  }, {} as Record<string, any>);
+  }, {} as Record<string, Record<string, number>>);
 
-  const chartData = Object.values(dateGroups);
+  const chartData = Object.entries(dateGroups).map(([date, areas]) => ({
+    date,
+    ...areas
+  }));
 
   // Colors for different areas
   const colors = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'];

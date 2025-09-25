@@ -27,7 +27,7 @@ export async function GET(request: NextRequest) {
 
     const skip = (page - 1) * limit;
 
-    const where: any = {};
+    const where: Record<string, unknown> = {};
     if (category) where.category = category;
     if (search) {
       where.OR = [

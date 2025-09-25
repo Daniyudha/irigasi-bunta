@@ -20,7 +20,7 @@ export async function GET(request: NextRequest) {
     // Convert members JSON to array for each farmer with robust error handling
     const farmersWithParsedMembers = farmers.map(farmer => {
       try {
-        let membersData = farmer.members;
+        const membersData = farmer.members;
         if (Array.isArray(membersData)) {
           return { ...farmer, members: membersData };
         }

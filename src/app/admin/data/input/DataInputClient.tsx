@@ -400,7 +400,7 @@ export default function DataInputClient() {
                     name="members"
                     required
                     value={formData.members}
-                    onChange={(e) => handleInputChange(e as any)}
+                    onChange={handleInputChange}
                     placeholder="Enter member names separated by commas"
                     rows={3}
                     className="w-full px-3 py-2 text-black border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -453,7 +453,7 @@ export default function DataInputClient() {
                 <li>• Specify the official name of the farmer group</li>
                 <li>• Enter the full name of the group chairman</li>
                 <li>• List all member names separated by commas</li>
-                <li>• Example member format: "Budi Santoso, Siti Rahayu, Ahmad Fauzi"</li>
+                <li>• Example member format: &ldquo;Budi Santoso, Siti Rahayu, Ahmad Fauzi&rdquo;</li>
               </>
             )}
           </ul>

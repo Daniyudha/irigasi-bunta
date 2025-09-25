@@ -23,13 +23,18 @@ export default function RainfallChart({ data }: RainfallChartProps) {
   const areas = [...new Set(data.map(item => item.area))];
   
   // Group data by date for the chart - create an object for each date with values for each area
-  const dateGroups = data.reduce((acc, item) => {
+  interface ChartDataPoint {
+    date: string;
+    [key: string]: string | number;
+  }
+
+  const dateGroups = data.reduce<Record<string, ChartDataPoint>>((acc, item) => {
     if (!acc[item.date]) {
       acc[item.date] = { date: item.date };
     }
     acc[item.date][item.area] = item.rainfall;
     return acc;
-  }, {} as Record<string, any>);
+  }, {});
 
   const chartData = Object.values(dateGroups);
 

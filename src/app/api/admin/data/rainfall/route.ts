@@ -181,7 +181,7 @@ export async function DELETE(request: NextRequest) {
 
     // Check if user has data delete permission or is SUPER_ADMIN
     const hasDataDeletePermission = user.role.permissions.some(
-      (rolePermission: any) => rolePermission.permission.name === 'data:delete'
+      (rolePermission) => rolePermission.permission.name === 'data:delete'
     );
     const isSuperAdmin = user.role.name === 'SUPER_ADMIN';
 

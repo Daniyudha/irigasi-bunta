@@ -4,13 +4,9 @@ import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { UpdateFarmerInput } from '@/types/farmer';
 
-interface RouteParams {
-  params: { id: string };
-}
-
 export async function GET(
   request: NextRequest,
-  { params }: RouteParams
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -19,7 +15,7 @@ export async function GET(
       return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
     }
 
-    const { id } = params;
+    const { id } = await params;
 
     const farmer = await prisma.farmer.findUnique({
       where: { id },
@@ -59,7 +55,7 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: RouteParams
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -68,7 +64,7 @@ export async function PUT(
       return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
     }
 
-    const { id } = params;
+    const { id } = await params;
     const body: UpdateFarmerInput = await request.json();
     const { name, group, chairman, members, userId } = body;
 
@@ -122,7 +118,7 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: RouteParams
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -131,7 +127,7 @@ export async function DELETE(
       return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
     }
 
-    const { id } = params;
+    const { id } = await params;
 
     // Check if farmer exists
     const existingFarmer = await prisma.farmer.findUnique({

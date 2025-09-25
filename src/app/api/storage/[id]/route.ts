@@ -7,7 +7,7 @@ import { authOptions } from '@/lib/auth';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -16,8 +16,10 @@ export async function GET(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    const { id } = await context.params;
+
     const file = await prisma.fileStorage.findUnique({
-      where: { id: params.id }
+      where: { id }
     });
 
     if (!file) {
@@ -52,7 +54,7 @@ export async function GET(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -61,8 +63,10 @@ export async function DELETE(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    const { id } = await context.params;
+
     const file = await prisma.fileStorage.findUnique({
-      where: { id: params.id }
+      where: { id }
     });
 
     if (!file) {
@@ -103,7 +107,7 @@ export async function DELETE(
 
     // Delete from database
     await prisma.fileStorage.delete({
-      where: { id: params.id }
+      where: { id }
     });
 
     return NextResponse.json({ message: 'File deleted successfully' });

@@ -19,7 +19,7 @@ export async function GET(request: NextRequest) {
     const skip = (page - 1) * limit;
 
     // Build where clause for search and category
-    let where: any = {};
+    let where: Record<string, unknown> = {};
 
     if (search) {
       where.OR = [
