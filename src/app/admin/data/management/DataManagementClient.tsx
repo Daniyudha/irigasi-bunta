@@ -187,7 +187,7 @@ export default function DataManagementClient() {
   };
 
   const handleDelete = async (id: string, itemType?: DataType) => {
-    if (!confirm('Are you sure you want to delete this data?')) {
+    if (!confirm('Apakah Anda yakin ingin menghapus data ini?')) {
       return;
     }
 
@@ -686,10 +686,17 @@ export default function DataManagementClient() {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                         <Link
-                          href={`/admin/data/edit/${dataType === 'all' ? (item as CombinedData).type : dataType}/${item.id}`}
+                          href={dataType === 'all'
+                            ? (item as CombinedData).type === 'farmer'
+                              ? `/admin/farmer-groups/edit/${item.id}`
+                              : `/admin/data/edit/${(item as CombinedData).type}/${item.id}`
+                            : dataType === 'farmer'
+                              ? `/admin/farmer-groups/edit/${item.id}`
+                              : `/admin/data/edit/${dataType}/${item.id}`
+                          }
                           className="text-blue-600 hover:text-blue-900 mr-4"
                         >
-                          Edit
+                          Ubah
                         </Link>
                         <button
                           onClick={() => handleDelete(item.id, dataType === 'all' ? (item as CombinedData).type : undefined)}

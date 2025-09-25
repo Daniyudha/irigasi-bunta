@@ -49,10 +49,24 @@ export default function EditSliderClient() {
     active: true,
   });
 
+  // Use useEffect for authentication check to avoid React render phase issues
   useEffect(() => {
     if (status === 'loading') return;
+
+    // Check if user is authenticated and has admin or super admin role
+    if (!session || !session.user || (session.user.role !== 'ADMIN' && session.user.role !== 'SUPER_ADMIN')) {
+      router.push('/login');
+    }
+  }, [session, status, router]);
+
+  useEffect(() => {
+    // Only fetch slider if user is authenticated and has proper role
+    if (status === 'loading') return;
+    if (!session || !session.user || (session.user.role !== 'ADMIN' && session.user.role !== 'SUPER_ADMIN')) {
+      return;
+    }
     fetchSlider();
-  }, [status, id]);
+  }, [session, status, id]);
 
   const fetchSlider = async () => {
     try {
@@ -163,9 +177,14 @@ export default function EditSliderClient() {
     );
   }
 
-  if (!session || session.user.role !== 'ADMIN') {
-    router.push('/login');
-    return null;
+  // Only render if user is authenticated and has proper role
+  if (!session || !session.user || (session.user.role !== 'ADMIN' && session.user.role !== 'SUPER_ADMIN')) {
+    // Show loading while redirecting
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-gray-600">Redirecting to login...</div>
+      </div>
+    );
   }
 
   return (
@@ -175,9 +194,9 @@ export default function EditSliderClient() {
           href="/admin/content/sliders"
           className="text-blue-600 hover:text-blue-800 mr-4"
         >
-          ← Back to Sliders
+          ← Kembali ke Sliders
         </Link>
-        <h1 className="text-3xl font-bold text-gray-800">Edit Slider</h1>
+        <h1 className="text-3xl font-bold text-gray-800">Ubah Slider</h1>
       </div>
 
       {error && (
@@ -190,7 +209,7 @@ export default function EditSliderClient() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Title *
+              Judul *
             </label>
             <input
               type="text"
@@ -199,13 +218,13 @@ export default function EditSliderClient() {
               onChange={handleChange}
               required
               className="w-full px-3 py-2 text-black border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Enter slider title"
+              placeholder="Masukkan judul slider"
             />
           </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Subtitle
+              Subjudul
             </label>
             <input
               type="text"
@@ -213,13 +232,13 @@ export default function EditSliderClient() {
               value={formData.subtitle}
               onChange={handleChange}
               className="w-full px-3 py-2 text-black border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Enter slider subtitle"
+              placeholder="Masukkan subjudul slider"
             />
           </div>
 
           <div className="md:col-span-2">
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Image
+              Gambar
             </label>
             <input
               ref={fileInputRef}
@@ -229,13 +248,13 @@ export default function EditSliderClient() {
               className="w-full file:px-3 file:py-2 file:bg-gray-300 text-black border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
             <p className="text-sm text-gray-500 mt-1">
-              Upload a new image to replace the current one (recommended: 1200x600px)
+              Unggah gambar baru untuk mengganti yang saat ini (disarankan: 1200x600px)
             </p>
           </div>
 
           {previewUrl && (
             <div className="col-span-2">
-              <h3 className="text-sm text-black font-semibold mb-4">Preview:</h3>
+              <h3 className="text-sm text-black font-semibold mb-4">Pratinjau:</h3>
               <div className="rounded-lg relative">
                 <img
                   src={previewUrl}
@@ -257,7 +276,7 @@ export default function EditSliderClient() {
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Link URL
+              URL Tautan
             </label>
             <input
               type="text"
@@ -265,13 +284,13 @@ export default function EditSliderClient() {
               value={formData.link}
               onChange={handleChange}
               className="w-full px-3 py-2 text-black border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="/irrigation or https://example.com"
+              placeholder="/irrigation atau https://example.com"
             />
           </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Button Text
+              Teks Tombol
             </label>
             <input
               type="text"
@@ -285,7 +304,7 @@ export default function EditSliderClient() {
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Order
+              Urutan
             </label>
             <input
               type="number"
@@ -306,7 +325,7 @@ export default function EditSliderClient() {
               className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
             />
             <label className="ml-2 block text-sm text-gray-900">
-              Active
+              Aktif
             </label>
           </div>
         </div>
@@ -316,14 +335,14 @@ export default function EditSliderClient() {
             href="/admin/content/sliders"
             className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
           >
-            Cancel
+            Batal
           </Link>
           <button
             type="submit"
             disabled={saving}
             className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 cursor-pointer"
           >
-            {saving ? 'Updating...' : 'Update Slider'}
+            {saving ? 'Memperbarui...' : 'Perbarui Slider'}
           </button>
         </div>
       </form>

@@ -42,7 +42,7 @@ export default function RolesManagementClient() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this role?')) {
+    if (!confirm('Apakah Anda yakin ingin menghapus peran ini?')) {
       return;
     }
 
@@ -85,12 +85,12 @@ export default function RolesManagementClient() {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold text-gray-900">Role Management</h1>
+        <h1 className="text-3xl font-bold text-gray-900">Manajemen Peran</h1>
         <Link
           href="/admin/roles/create"
           className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
         >
-          Create New Role
+          Buat Peran Baru
         </Link>
       </div>
 
@@ -99,22 +99,22 @@ export default function RolesManagementClient() {
           <thead className="bg-gray-50">
             <tr>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Name
+                Nama
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Description
+                Deskripsi
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Permissions
+                Izin
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Users
+                Pengguna
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Default
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Actions
+                Aksi
               </th>
             </tr>
           </thead>
@@ -128,13 +128,13 @@ export default function RolesManagementClient() {
                   {role.description || '-'}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {role.permissions.length} permissions
+                  {role.permissions.length} izin
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {role.users.length} users
+                  {role.users.length} pengguna
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {role.isDefault ? 'Yes' : 'No'}
+                  {role.isDefault ? 'Ya' : 'Tidak'}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
                   {role.name !== 'SUPER_ADMIN' ? (
@@ -150,11 +150,11 @@ export default function RolesManagementClient() {
                         disabled={deleteLoading === role.id}
                         className="text-red-600 hover:text-red-900 disabled:opacity-50 cursor-pointer"
                       >
-                        {deleteLoading === role.id ? 'Deleting...' : 'Delete'}
+                        {deleteLoading === role.id ? 'Menghapus...' : 'Hapus'}
                       </button>
                     </>
                   ) : (
-                    <span className="text-gray-400">Undeletable/Uneditable</span>
+                    <span className="text-gray-400">Tidak Dapat Dihapus/Diedit</span>
                   )}
                 </td>
               </tr>
@@ -164,7 +164,7 @@ export default function RolesManagementClient() {
 
         {roles.length === 0 && (
           <div className="text-center py-12">
-            <p className="text-gray-500">No roles found.</p>
+            <p className="text-gray-500">Tidak ada peran ditemukan.</p>
           </div>
         )}
       </div>

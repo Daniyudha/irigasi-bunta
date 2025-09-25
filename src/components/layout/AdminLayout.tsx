@@ -25,6 +25,7 @@ import {
   MessageCircle,
   Menu,
   X,
+  Archive,
 } from 'lucide-react';
 import { getAccessibleNavigation } from '@/lib/permissions';
 
@@ -58,6 +59,7 @@ const iconMap = {
   UserRoundCog: UserRoundCog,
   ShieldCheck: ShieldCheck,
   MessageCircle: MessageCircle,
+  Archive: Archive,
 };
 
 export default function AdminLayout({ children }: AdminLayoutProps) {

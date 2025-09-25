@@ -81,12 +81,12 @@ export async function GET(request: NextRequest) {
     const search = searchParams.get('search') || '';
     const skip = (page - 1) * limit;
 
-    // Build where clause for search
+    // Build where clause for search (MySQL compatible)
     const where = search ? {
       OR: [
-        { name: { contains: search, mode: 'insensitive' } },
-        { group: { contains: search, mode: 'insensitive' } },
-        { chairman: { contains: search, mode: 'insensitive' } },
+        { name: { contains: search } },
+        { group: { contains: search } },
+        { chairman: { contains: search } },
       ],
     } : {};
 

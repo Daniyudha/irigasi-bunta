@@ -19,11 +19,22 @@ export default function RainfallChart({ data }: RainfallChartProps) {
     );
   }
 
-  // Group data by date for the chart
-  const chartData = data.map(item => ({
-    date: item.date,
-    [item.area]: item.rainfall,
-  }));
+  // Get all unique areas from the data
+  const areas = [...new Set(data.map(item => item.area))];
+  
+  // Group data by date for the chart - create an object for each date with values for each area
+  const dateGroups = data.reduce((acc, item) => {
+    if (!acc[item.date]) {
+      acc[item.date] = { date: item.date };
+    }
+    acc[item.date][item.area] = item.rainfall;
+    return acc;
+  }, {} as Record<string, any>);
+
+  const chartData = Object.values(dateGroups);
+
+  // Colors for different areas
+  const colors = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'];
 
   return (
     <div className="w-full h-80">
@@ -43,7 +54,13 @@ export default function RainfallChart({ data }: RainfallChartProps) {
           <YAxis />
           <Tooltip />
           <Legend />
-          <Bar dataKey="Bunta" fill="#3b82f6" />
+          {areas.map((area, index) => (
+            <Bar
+              key={area}
+              dataKey={area}
+              fill={colors[index % colors.length]}
+            />
+          ))}
         </BarChart>
       </ResponsiveContainer>
     </div>

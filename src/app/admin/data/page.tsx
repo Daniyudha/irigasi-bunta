@@ -45,7 +45,7 @@ export default async function AdminData() {
           <div className="bg-white p-6 rounded-lg shadow-md">
             <h3 className="text-xl font-semibold mb-4 text-purple-600">Impor CSV</h3>
             <p className="text-gray-600 mb-4">Impor data massal dari file CSV</p>
-            <button className="w-full bg-purple-600 text-white py-2 px-4 rounded hover:bg-purple-700 transition-colors">
+            <button className="w-full bg-purple-600 text-white py-2 px-4 cursor-pointer rounded hover:bg-purple-700 transition-colors">
               Impor Data
             </button>
           </div>
@@ -53,7 +53,7 @@ export default async function AdminData() {
           <div className="bg-white p-6 rounded-lg shadow-md">
             <h3 className="text-xl font-semibold mb-4 text-orange-600">Ekspor Data</h3>
             <p className="text-gray-600 mb-4">Ekspor data ke format CSV/Excel</p>
-            <button className="w-full bg-orange-600 text-white py-2 px-4 rounded hover:bg-orange-700 transition-colors">
+            <button className="w-full bg-orange-600 text-white py-2 px-4 cursor-pointer rounded hover:bg-orange-700 transition-colors">
               Ekspor Data
             </button>
           </div>
@@ -61,7 +61,7 @@ export default async function AdminData() {
           <div className="bg-white p-6 rounded-lg shadow-md">
             <h3 className="text-xl font-semibold mb-4 text-teal-600">Data Historis</h3>
             <p className="text-gray-600 mb-4">Lihat dan edit catatan historis</p>
-            <button className="w-full bg-teal-600 text-white py-2 px-4 rounded hover:bg-teal-700 transition-colors">
+            <button className="w-full bg-teal-600 text-white py-2 px-4 cursor-pointer rounded hover:bg-teal-700 transition-colors">
               Lihat Riwayat
             </button>
           </div>

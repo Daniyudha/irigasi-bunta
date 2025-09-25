@@ -87,11 +87,11 @@ export default function GalleryManagementClient() {
         setTotalItems(data.pagination?.total || 0);
       } else {
         const errorData = await response.json().catch(() => ({}));
-        setError(errorData.message || 'Failed to fetch gallery items');
+        setError(errorData.message || 'Gagal mengambil data item galeri');
         console.error('API error:', errorData);
       }
     } catch (err) {
-      setError('Network error: Unable to fetch gallery items');
+      setError('Error jaringan: Tidak dapat mengambil data item galeri');
       console.error('Fetch error:', err);
     } finally {
       setTableLoading(false);
@@ -100,7 +100,7 @@ export default function GalleryManagementClient() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this gallery item?')) return;
+    if (!confirm('Apakah Anda yakin ingin menghapus item galeri ini?')) return;
 
     try {
       const response = await fetch(`/api/admin/gallery/${id}`, {
@@ -110,10 +110,10 @@ export default function GalleryManagementClient() {
       if (response.ok) {
         setGallery(gallery.filter(item => item.id !== id));
       } else {
-        setError('Failed to delete gallery item');
+        setError('Gagal menghapus item galeri');
       }
     } catch (err) {
-      setError('Error deleting gallery item');
+      setError('Error menghapus item galeri');
     }
   };
 
@@ -130,10 +130,10 @@ export default function GalleryManagementClient() {
       if (response.ok) {
         fetchGallery(); // Refresh the list
       } else {
-        setError('Failed to update gallery item');
+        setError('Gagal memperbarui item galeri');
       }
     } catch (err) {
-      setError('Error updating gallery item');
+      setError('Error memperbarui item galeri');
     }
   };
 
@@ -174,14 +174,14 @@ export default function GalleryManagementClient() {
       <div className="max-w-7xl mx-auto">
         <div className="mb-8 flex justify-between items-center">
           <div>
-            <h1 className="text-3xl font-bold text-gray-800">Gallery Management</h1>
-            <p className="text-gray-600 mt-2">Manage gallery images and videos</p>
+            <h1 className="text-3xl font-bold text-gray-800">Manajemen Galeri</h1>
+            <p className="text-gray-600 mt-2">Kelola gambar dan video galeri</p>
           </div>
           <Link
             href="/admin/content/gallery/create"
             className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors"
           >
-            Add New Item
+            Tambah Item Baru
           </Link>
         </div>
 
@@ -196,7 +196,7 @@ export default function GalleryManagementClient() {
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
               <label htmlFor="categoryFilter" className="text-sm font-medium text-gray-700">
-                Filter by Category:
+                Filter berdasarkan Kategori:
               </label>
               <select
                 id="categoryFilter"
@@ -211,9 +211,9 @@ export default function GalleryManagementClient() {
                 ))}
               </select>
               <span className="text-sm text-gray-500">
-                Showing {(currentPage - 1) * itemsPerPage + 1} to {Math.min(currentPage * itemsPerPage, totalItems)} of {totalItems} results
+                Menampilkan {(currentPage - 1) * itemsPerPage + 1} sampai {Math.min(currentPage * itemsPerPage, totalItems)} dari {totalItems} hasil
                 {searchQuery && (
-                  <span> for &ldquo;<strong>{searchQuery}</strong>&rdquo;</span>
+                  <span> untuk &ldquo;<strong>{searchQuery}</strong>&rdquo;</span>
                 )}
               </span>
             </div>
@@ -227,7 +227,7 @@ export default function GalleryManagementClient() {
                   </div>
                   <input
                     type="text"
-                    placeholder="Search gallery by title..."
+                    placeholder="Cari galeri berdasarkan judul..."
                     value={searchQuery}
                     onChange={handleSearchChange}
                     className="block w-full text-black pl-10 pr-12 py-2 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -314,7 +314,7 @@ export default function GalleryManagementClient() {
                           : 'bg-gray-100 text-gray-800'
                       }`}
                     >
-                      {item.active ? 'Active' : 'Inactive'}
+                      {item.active ? 'Aktif' : 'Nonaktif'}
                     </span>
                   </td>
                   <td className="px-6 py-4 text-center whitespace-nowrap text-sm text-gray-500">
@@ -329,7 +329,7 @@ export default function GalleryManagementClient() {
                           : 'bg-green-600 hover:bg-green-700'
                       } text-white px-3 py-1 rounded text-xs`}
                     >
-                      {item.active ? 'Deactivate' : 'Activate'}
+                      {item.active ? 'Nonaktifkan' : 'Aktifkan'}
                     </button>
                     <Link
                       href={`/admin/content/gallery/edit/${item.id}`}
@@ -341,7 +341,7 @@ export default function GalleryManagementClient() {
                       onClick={() => handleDelete(item.id)}
                       className="bg-red-600 text-white px-3 py-1 rounded text-xs hover:bg-red-700"
                     >
-                      Delete
+                      Hapus
                     </button>
                   </td>
                 </tr>
@@ -354,7 +354,7 @@ export default function GalleryManagementClient() {
             <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-700">
-                  Page {currentPage} of {totalPages}
+                  Halaman {currentPage} dari {totalPages}
                 </p>
               </div>
               <div className="flex space-x-2">
@@ -390,7 +390,7 @@ export default function GalleryManagementClient() {
 
           {filteredGallery.length === 0 && !loading && (
             <div className="text-center py-8 text-gray-500">
-              No gallery items found. Create your first item!
+              Tidak ada item galeri ditemukan. Buat item pertama Anda!
             </div>
           )}
         </div>

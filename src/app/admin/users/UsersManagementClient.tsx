@@ -62,10 +62,10 @@ export default function UsersManagementClient() {
         const data = await response.json();
         setUsers(data);
       } else {
-        setError('Failed to fetch users');
+        setError('Gagal mengambil data pengguna');
       }
     } catch (err) {
-      setError('Error fetching users');
+      setError('Error mengambil data pengguna');
     } finally {
       setLoading(false);
     }
@@ -106,15 +106,15 @@ export default function UsersManagementClient() {
         fetchUsers(); // Refresh the list
       } else {
         const errorData = await response.json();
-        setError(errorData.message || 'Failed to save user');
+        setError(errorData.message || 'Gagal menyimpan pengguna');
       }
     } catch (err) {
-      setError('Error saving user');
+      setError('Error menyimpan pengguna');
     }
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this user?')) return;
+    if (!confirm('Apakah Anda yakin ingin menghapus pengguna ini?')) return;
 
     try {
       const response = await fetch(`/api/admin/users/${id}`, {
@@ -125,10 +125,10 @@ export default function UsersManagementClient() {
         fetchUsers(); // Refresh the list
       } else {
         const errorData = await response.json();
-        setError(errorData.message || 'Failed to delete user');
+        setError(errorData.message || 'Gagal menghapus pengguna');
       }
     } catch (err) {
-      setError('Error deleting user');
+      setError('Error menghapus pengguna');
     }
   };
 

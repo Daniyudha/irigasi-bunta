@@ -18,10 +18,10 @@ export async function GET(request: NextRequest) {
 
     const whereClause = search ? {
       OR: [
-        { filename: { contains: search, mode: 'insensitive' } },
-        { originalName: { contains: search, mode: 'insensitive' } },
-        { altText: { contains: search, mode: 'insensitive' } },
-        { caption: { contains: search, mode: 'insensitive' } },
+        { filename: { contains: search } },
+        { originalName: { contains: search } },
+        { altText: { contains: search } },
+        { caption: { contains: search } },
       ],
     } : {};
 

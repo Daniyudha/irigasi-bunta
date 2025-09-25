@@ -44,6 +44,9 @@ node scripts/update-news-categories.js
 
 # Check data
 node scripts/check-data.js
+
+# Check permissions count
+node scripts/check-permissions-simple.js
 ```
 
 ### 6. Build the Application

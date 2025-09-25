@@ -63,11 +63,11 @@ export default function DataPage() {
         if (response.ok) {
           const data: DbWaterLevelData[] = await response.json();
           console.log('Raw water level data from API:', data);
-          // Transform database data to chart format
+          // Transform database data to chart format - use actual locations
           const transformedData: ChartWaterLevelData[] = data.map(item => ({
             date: item.measuredAt?.split('T')[0] || new Date().toISOString().split('T')[0],
             level: Number(item.value) || 0,
-            area: 'Bunta' // Force area to be 'Bunta' for chart compatibility
+            area: item.location || 'Lokasi Tidak Diketahui'
           }));
           console.log('Water level transformed data:', transformedData);
           setChartWaterData(transformedData);
@@ -78,11 +78,11 @@ export default function DataPage() {
         const response = await fetch('/api/data/rainfall');
         if (response.ok) {
           const data: DbRainfallData[] = await response.json();
-          // Transform database data to chart format
+          // Transform database data to chart format - use actual locations
           const transformedData: ChartRainfallData[] = data.map(item => ({
             date: item.measuredAt?.split('T')[0] || new Date().toISOString().split('T')[0],
             rainfall: Number(item.value) || 0,
-            area: 'Bunta' // Force area to be 'Bunta' for chart compatibility
+            area: item.location || 'Lokasi Tidak Diketahui'
           }));
           console.log('Rainfall transformed data:', transformedData);
           setChartRainfallData(transformedData);
@@ -117,7 +117,7 @@ export default function DataPage() {
     { id: 'water', label: 'Level Air', icon: '💧' },
     { id: 'rainfall', label: 'Curah Hujan', icon: '🌧️' },
     { id: 'crops', label: 'Data Tanaman', icon: '🌾' },
-    { id: 'farmers', label: 'Statistik Petani', icon: '👨‍🌾' },
+    { id: 'farmers', label: 'Data Kelompok Petani', icon: '👨‍🌾' },
   ];
 
   const renderTabContent = () => {

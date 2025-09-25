@@ -27,10 +27,11 @@ export default async function EditDataPage({ params }: PageProps) {
     redirect('/login');
   }
 
-  const { type, id } = params;
+  // Await the params promise before destructuring
+  const { type, id } = await params;
 
   // Validate the type
-  if (type !== 'water-level' && type !== 'rainfall') {
+  if (type !== 'water-level' && type !== 'rainfall' && type !== 'crop') {
     redirect('/admin/data/management');
   }
 

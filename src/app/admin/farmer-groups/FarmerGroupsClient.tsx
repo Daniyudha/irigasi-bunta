@@ -200,7 +200,7 @@ export default function FarmerGroupsClient() {
                             href={`/admin/farmer-groups/edit/${farmer.id}`}
                             className="text-blue-600 hover:text-blue-900 mr-4"
                           >
-                            Edit
+                            Ubah
                           </Link>
                           <button
                             onClick={() => handleDelete(farmer.id)}

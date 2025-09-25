@@ -40,6 +40,15 @@ export default function Lightbox({
     }
     return url;
   };
+
+  // Determine if it's a YouTube Short (9:16 aspect ratio)
+  const isYouTubeShort = (url: string): boolean => {
+    const youtubeId = extractYoutubeId(url);
+    // For now, we'll assume all videos are regular videos unless we have a way to detect shorts
+    // You can enhance this by checking video metadata or adding a prop
+    return false;
+  };
+
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
@@ -65,72 +74,86 @@ export default function Lightbox({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-800/70 backdrop-blur-sm p-4">
-      {/* Close button */}
+    <div 
+      className="fixed inset-0 bg-black/90 flex flex-col items-center justify-center z-50"
+      onClick={onClose}
+    >
+      {/* Close Button - Top Right */}
       <button
+        className="absolute top-6 right-6 text-white text-3xl cursor-pointer z-10 rounded-full p-3 hover:text-gray-400 transition-colors"
         onClick={onClose}
-        className="absolute top-4 right-4 text-white text-3xl hover:text-gray-200 cursor-pointer transition-colors z-10"
       >
         ✕
       </button>
 
-      {/* Navigation Arrows - Fixed to viewport edges */}
+      {/* Navigation Buttons - Left and Right */}
       {onNext && onPrev && (
         <>
-          {/* Previous Arrow */}
           {hasPrev && (
             <button
-              onClick={onPrev}
-              className="fixed left-4 top-1/2 transform -translate-y-1/2 hover:text-gray-300 text-white cursor-pointer p-4 rounded-full transition-all z-10"
-              aria-label="Previous image"
+              className="absolute left-6 top-1/2 -translate-y-1/2 text-white text-3xl cursor-pointer z-10 rounded-full p-3 hover:text-gray-400 transition-colors"
+              onClick={(e) => {
+                e.stopPropagation();
+                onPrev();
+              }}
             >
-              <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              {/* ChevronLeft icon - using SVG similar to example */}
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
               </svg>
             </button>
           )}
           
-          {/* Next Arrow */}
           {hasNext && (
             <button
-              onClick={onNext}
-              className="fixed right-4 top-1/2 transform -translate-y-1/2 hover:text-gray-300 text-white cursor-pointer p-4 rounded-full transition-all z-10"
-              aria-label="Next image"
+              className="absolute right-6 top-1/2 -translate-y-1/2 text-white text-3xl cursor-pointer z-10 rounded-full p-3 hover:text-gray-400 transition-colors"
+              onClick={(e) => {
+                e.stopPropagation();
+                onNext();
+              }}
             >
-              <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              {/* ChevronRight icon - using SVG similar to example */}
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
               </svg>
             </button>
           )}
         </>
       )}
 
-      {/* Media Content Container */}
-      <div className="relative w-full max-w-6xl h-full max-h-[90vh]">
-        <div className="bg-white rounded-lg overflow-hidden h-full flex flex-col">
-          <div className="flex-1 bg-gray-200 flex items-center justify-center min-h-0">
-            {type === 'image' ? (
-              imageUrl ? (
-                <img
-                  src={imageUrl}
-                  alt={title}
-                  className="w-full h-full object-contain"
-                />
-              ) : (
-                <span className="text-gray-500">No Image</span>
-              )
+      {/* Main Content Container - Centered and sized to media */}
+      <div
+        className="flex flex-col items-center"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Media Area - Sized based on content */}
+        <div className="bg-black/50 rounded-t-lg overflow-hidden flex justify-center">
+          {type === 'image' ? (
+            imageUrl ? (
+              // Image Content - Natural aspect ratio
+              <img
+                src={imageUrl}
+                alt={title}
+                className="max-h-[75vh] w-auto object-contain"
+              />
             ) : (
-              // Video: YouTube embed
-              imageUrl ? (
+              <span className="text-gray-500 p-8">No Image</span>
+            )
+          ) : (
+            // Video Content - Sized based on type
+            imageUrl ? (
+              <div className={
+                isYouTubeShort(imageUrl) 
+                  ? 'w-[40vw] max-w-[400px] aspect-[9/16]'
+                  : 'w-[80vw] max-w-[1200px] aspect-video'
+              }>
                 <iframe
-                  width="100%"
-                  height="100%"
                   src={getEmbedUrl(imageUrl)}
                   title={title}
+                  className="w-full h-full"
                   frameBorder="0"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                   allowFullScreen
-                  className="w-full h-full"
                   onError={(e) => {
                     console.error('Failed to load video:', imageUrl);
                     const iframe = e.currentTarget as HTMLIFrameElement;
@@ -141,17 +164,19 @@ export default function Lightbox({
                     errorDiv.innerHTML = 'Failed to load video';
                     iframe.parentNode?.appendChild(errorDiv);
                   }}
-                ></iframe>
-              ) : (
-                <span className="text-gray-500">No Video URL</span>
-              )
-            )}
-          </div>
-          
-          {/* Caption */}
-          <div className="p-6">
-            <h3 className="text-xl font-semibold text-gray-800 mb-2">{title}</h3>
-            <p className="text-gray-600">{description}</p>
+                />
+              </div>
+            ) : (
+              <span className="text-gray-500 p-8">No Video URL</span>
+            )
+          )}
+        </div>
+
+        {/* Caption Area - Matches media width exactly */}
+        <div className="bg-white p-4 rounded-b-lg w-full">
+          <div className="text-center">
+            <h3 className="text-xl font-bold text-black break-words mb-2">{title}</h3>
+            <p className="text-sm text-gray-600 break-words">{description}</p>
           </div>
         </div>
       </div>

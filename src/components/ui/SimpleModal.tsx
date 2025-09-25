@@ -16,7 +16,7 @@ export default function SimpleModal({ isOpen, onClose, title, children }: Simple
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       {/* Background overlay */}
       <div 
-        className="fixed inset-0 bg-black bg-opacity-50"
+        className="fixed inset-0 bg-black/50 bg-opacity-50 backdrop-blur-sm"
         onClick={onClose}
       ></div>
 

@@ -47,10 +47,9 @@ interface CropData {
 
 interface FarmerData {
   id: string;
-  district: string;
-  farmers: number;
-  area: number;
-  averageYield: number;
+  group: string;
+  chairman: string;
+  members: string[];
   createdAt: string;
 }
 
@@ -85,10 +84,10 @@ export default function HistoricalDataClient() {
 
     try {
       const [waterLevelResponse, rainfallResponse, cropResponse, farmerResponse] = await Promise.all([
-        fetch('/api/admin/data/water-level'),
-        fetch('/api/admin/data/rainfall'),
-        fetch('/api/admin/data/crops'),
-        fetch('/api/admin/data/farmers')
+        fetch('/api/admin/data/water-level', { credentials: 'include' }),
+        fetch('/api/admin/data/rainfall', { credentials: 'include' }),
+        fetch('/api/admin/data/crops', { credentials: 'include' }),
+        fetch('/api/admin/farmers', { credentials: 'include' })
       ]);
 
       if (!waterLevelResponse.ok || !rainfallResponse.ok || !cropResponse.ok || !farmerResponse.ok) {
@@ -96,12 +95,15 @@ export default function HistoricalDataClient() {
         return;
       }
 
-      const [waterLevelData, rainfallData, cropData, farmerData] = await Promise.all([
+      const [waterLevelData, rainfallData, cropData, farmerResponseData] = await Promise.all([
         waterLevelResponse.json(),
         rainfallResponse.json(),
         cropResponse.json(),
         farmerResponse.json()
       ]);
+
+      // Extract farmer data from the response structure { data: Farmer[], pagination: {...} }
+      const farmerData = farmerResponseData.data || [];
 
       setWaterLevelData(waterLevelData);
       setRainfallData(rainfallData);
@@ -204,19 +206,21 @@ export default function HistoricalDataClient() {
               <table className="min-w-full divide-y divide-gray-200">
                 <thead className="bg-gray-50">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">District</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Farmers</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Area (Ha)</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Avg Yield (Ton/Ha)</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nama Kelompok</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Ketua</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Jumlah Anggota</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tanggal Dibentuk</th>
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
                   {farmerData.map((item) => (
                     <tr key={item.id}>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{item.district}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{item.farmers}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{item.area}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{item.averageYield}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{item.group}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{item.chairman}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{item.members ? item.members.length : 0}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {new Date(item.createdAt).toLocaleDateString('id-ID')}
+                      </td>
                     </tr>
                   ))}
                 </tbody>

@@ -161,8 +161,8 @@ export default function NewsManagementClient() {
       <div className="max-w-7xl mx-auto">
         <div className="mb-8 flex justify-between items-center">
           <div>
-            <h1 className="text-3xl font-bold text-gray-800">News Management</h1>
-            <p className="text-gray-600 mt-2">Create and manage news articles</p>
+            <h1 className="text-3xl font-bold text-gray-800">Manajemen Berita</h1>
+            <p className="text-gray-600 mt-2">Tulis dan kelola berita.</p>
           </div>
           <Link
             href="/admin/content/news/create"
@@ -183,7 +183,7 @@ export default function NewsManagementClient() {
             {/* Results Info */}
             <div className="px-6 py-4 ">
               <p className="text-sm text-gray-600">
-                Showing {(currentPage - 1) * itemsPerPage + 1} to {Math.min(currentPage * itemsPerPage, totalItems)} of {totalItems} results
+                Menampilkan {(currentPage - 1) * itemsPerPage + 1} sd {Math.min(currentPage * itemsPerPage, totalItems)} dari {totalItems} hasil
                 {searchQuery && (
                   <span> for &ldquo;<strong>{searchQuery}</strong>&rdquo;</span>
                 )}
@@ -198,7 +198,7 @@ export default function NewsManagementClient() {
                   </div>
                   <input
                     type="text"
-                    placeholder="Search news by title, slug, or content..."
+                    placeholder="Cari berita berdasarkan judul, slug, or konten..."
                     value={searchQuery}
                     onChange={handleSearchChange}
                     className="block w-full text-black pl-10 pr-12 py-2 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -307,7 +307,7 @@ export default function NewsManagementClient() {
           </table>
           {news.length === 0 && !loading && (
             <div className="text-center py-8 text-gray-500">
-              {searchQuery ? 'No news articles found matching your search.' : 'No news articles found. Create your first article!'}
+              {searchQuery ? 'Tidak ditemukan artikel berita yang sesuai dengan pencarian Anda.' : 'Tidak ada artikel berita yang ditemukan. Buat artikel pertama Anda!'}
             </div>
           )}
 

@@ -11,15 +11,52 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
     }
 
-    const categories = await prisma.category.findMany({
-      orderBy: { name: 'asc' },
-    });
+    // Get query parameters
+    const { searchParams } = new URL(request.url);
+    const page = parseInt(searchParams.get('page') || '1');
+    const limit = parseInt(searchParams.get('limit') || '10');
+    const search = searchParams.get('search') || '';
 
-    return NextResponse.json(categories);
+    // Calculate pagination
+    const skip = (page - 1) * limit;
+    const take = limit;
+
+    // Build where clause for search (MySQL compatible case-insensitive search)
+    const where = search ? {
+      OR: [
+        { name: { contains: search } },
+        { description: { contains: search } }
+      ]
+    } : {};
+
+    // Get categories with pagination and search
+    const [categories, totalCount] = await Promise.all([
+      prisma.category.findMany({
+        where,
+        orderBy: { name: 'asc' },
+        skip,
+        take,
+      }),
+      prisma.category.count({ where })
+    ]);
+
+    const totalPages = Math.ceil(totalCount / limit);
+
+    return NextResponse.json({
+      data: categories,
+      pagination: {
+        page,
+        limit,
+        total: totalCount,
+        pages: totalPages,
+        hasNext: page < totalPages,
+        hasPrev: page > 1
+      }
+    });
   } catch (error) {
     console.error('Error fetching categories:', error);
     return NextResponse.json(
-      { message: 'Internal server error' },
+      { message: `Database error: ${error instanceof Error ? error.message : 'Unknown error'}` },
       { status: 500 }
     );
   }

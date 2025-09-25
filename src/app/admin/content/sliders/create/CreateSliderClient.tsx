@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -33,6 +33,16 @@ export default function CreateSliderClient() {
     active: true,
   });
 
+  // Use useEffect for authentication check to avoid React render phase issues
+  useEffect(() => {
+    if (status === 'loading') return;
+
+    // Check if user is authenticated and has admin or super admin role
+    if (!session || !session.user || (session.user.role !== 'ADMIN' && session.user.role !== 'SUPER_ADMIN')) {
+      router.push('/login');
+    }
+  }, [session, status, router]);
+
   if (status === 'loading') {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -41,8 +51,8 @@ export default function CreateSliderClient() {
     );
   }
 
-  if (!session || session.user.role !== 'ADMIN') {
-    router.push('/login');
+  // Return null if not authenticated (will redirect via useEffect)
+  if (!session || !session.user || (session.user.role !== 'ADMIN' && session.user.role !== 'SUPER_ADMIN')) {
     return null;
   }
 
@@ -119,9 +129,9 @@ export default function CreateSliderClient() {
           href="/admin/content/sliders"
           className="text-blue-600 hover:text-blue-800 mr-4"
         >
-          ← Back to Sliders
+          ← Kembali ke Sliders
         </Link>
-        <h1 className="mt-6 text-3xl font-bold text-gray-800">Create New Slider</h1>
+        <h1 className="mt-6 text-3xl font-bold text-gray-800">Buat Slider Baru</h1>
       </div>
 
       {error && (
@@ -134,7 +144,7 @@ export default function CreateSliderClient() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="md:col-span-2">
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Title *
+              Judul *
             </label>
             <input
               type="text"
@@ -143,13 +153,13 @@ export default function CreateSliderClient() {
               onChange={handleChange}
               required
               className="w-full px-3 py-2 text-black border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Enter slider title"
+              placeholder="Masukkan judul slider"
             />
           </div>
 
           <div className="md:col-span-2">
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Subtitle
+              Subjudul
             </label>
             <input
               type="text"
@@ -157,13 +167,13 @@ export default function CreateSliderClient() {
               value={formData.subtitle}
               onChange={handleChange}
               className="w-full px-3 py-2 text-black border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Enter slider subtitle"
+              placeholder="Masukkan subjudul slider"
             />
           </div>
 
           <div className="md:col-span-2">
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Image *
+              Gambar *
             </label>
             <input
               ref={fileInputRef}
@@ -174,13 +184,13 @@ export default function CreateSliderClient() {
               className="w-full file:px-3 file:py-2 file:bg-gray-300 text-black border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
             <p className="text-sm text-gray-500 mt-1">
-              Upload an image for the slider (recommended: 1200x600px)
+              Unggah gambar untuk slider (disarankan: 1200x600px)
             </p>
           </div>
 
           {previewUrl && (
         <div className="md:col-span-2">
-          <h3 className="text-sm text-gray-500 mb-2">Preview:</h3>
+          <h3 className="text-sm text-gray-500 mb-2">Pratinjau:</h3>
           <div className="rounded-lg relative">
             <img
               src={previewUrl}
@@ -202,7 +212,7 @@ export default function CreateSliderClient() {
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Link URL
+              URL Tautan
             </label>
             <input
               type="text"
@@ -216,7 +226,7 @@ export default function CreateSliderClient() {
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Button Text
+              Teks Tombol
             </label>
             <input
               type="text"
@@ -230,7 +240,7 @@ export default function CreateSliderClient() {
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Order
+              Urutan
             </label>
             <input
               type="number"
@@ -251,7 +261,7 @@ export default function CreateSliderClient() {
               className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
             />
             <label className="ml-2 block text-sm text-gray-900">
-              Active
+              Aktif
             </label>
           </div>
         </div>
@@ -261,14 +271,14 @@ export default function CreateSliderClient() {
             href="/admin/content/sliders"
             className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
           >
-            Cancel
+            Batal
           </Link>
           <button
             type="submit"
             disabled={loading || !formData.image}
             className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
           >
-            {loading ? 'Creating...' : 'Create Slider'}
+            {loading ? 'Membuat...' : 'Buat Slider'}
           </button>
         </div>
       </form>

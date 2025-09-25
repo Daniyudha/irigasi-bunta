@@ -60,6 +60,35 @@ const permissions = [
   // Reports Permissions
   { name: 'reports:view', description: 'View reports', category: 'Reports' },
   { name: 'reports:generate', description: 'Generate reports', category: 'Reports' },
+
+  // Storage Management Permissions
+  { name: 'storage:read', description: 'View storage files', category: 'Storage' },
+  { name: 'storage:upload', description: 'Upload files to storage', category: 'Storage' },
+  { name: 'storage:edit', description: 'Edit storage files', category: 'Storage' },
+  { name: 'storage:delete', description: 'Delete storage files', category: 'Storage' },
+  { name: 'storage:manage', description: 'Manage storage system', category: 'Storage' },
+
+  // Farmer Group Management Permissions
+  { name: 'farmer_groups:read', description: 'View farmer groups', category: 'Farmer Groups' },
+  { name: 'farmer_groups:create', description: 'Create new farmer groups', category: 'Farmer Groups' },
+  { name: 'farmer_groups:edit', description: 'Edit farmer groups', category: 'Farmer Groups' },
+  { name: 'farmer_groups:delete', description: 'Delete farmer groups', category: 'Farmer Groups' },
+
+  // Contact Submissions Management Permissions
+  { name: 'contact_submissions:read', description: 'View contact submissions', category: 'Contact Submissions' },
+  { name: 'contact_submissions:edit', description: 'Edit contact submissions', category: 'Contact Submissions' },
+
+  // Irrigation Data Permissions
+  { name: 'irrigation:read', description: 'View irrigation data', category: 'Irrigation' },
+  { name: 'irrigation:create', description: 'Create irrigation data', category: 'Irrigation' },
+  { name: 'irrigation:edit', description: 'Edit irrigation data', category: 'Irrigation' },
+  { name: 'irrigation:delete', description: 'Delete irrigation data', category: 'Irrigation' },
+
+  // Slider Management Permissions
+  { name: 'sliders:read', description: 'View sliders', category: 'Sliders' },
+  { name: 'sliders:create', description: 'Create new sliders', category: 'Sliders' },
+  { name: 'sliders:edit', description: 'Edit sliders', category: 'Sliders' },
+  { name: 'sliders:delete', description: 'Delete sliders', category: 'Sliders' },
 ];
 
 async function main() {

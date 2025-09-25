@@ -95,8 +95,8 @@ export const authOptions: NextAuthOptions = {
       } else if (token) {
         // Session refresh - ensure permissions are preserved
         // If permissions don't exist in token, we need to fetch them
-        if (!token.permissions) {
-          console.log('No permissions in token, fetching from database...');
+        if (!token.permissions || !token.role) {
+          console.log('No permissions or role in token, fetching from database...');
           try {
             const userData = await prisma.user.findUnique({
               where: { email: token.email as string },
@@ -114,13 +114,16 @@ export const authOptions: NextAuthOptions = {
             });
             
             if (userData && userData.role) {
+              token.role = userData.role.name;
               token.permissions = userData.role.permissions.map(rp => rp.permission.name);
-              console.log('Fetched permissions from DB:', token.permissions);
+              console.log('Fetched role and permissions from DB:', token.role, token.permissions);
             } else {
+              token.role = 'USER';
               token.permissions = [];
             }
           } catch (error) {
-            console.error('Error fetching permissions:', error);
+            console.error('Error fetching role and permissions:', error);
+            token.role = 'USER';
             token.permissions = [];
           }
         }

@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
+import fs from 'fs/promises';
+import path from 'path';
 
 export async function GET(
   req: NextRequest,
@@ -26,7 +28,7 @@ export async function GET(
       },
     });
 
-    if (!user || !user.role || user.role.name !== 'ADMIN') {
+    if (!user || !user.role || (user.role.name !== 'ADMIN' && user.role.name !== 'SUPER_ADMIN')) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
@@ -69,7 +71,7 @@ export async function DELETE(
       },
     });
 
-    if (!user || !user.role || user.role.name !== 'ADMIN') {
+    if (!user || !user.role || (user.role.name !== 'ADMIN' && user.role.name !== 'SUPER_ADMIN')) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
@@ -79,12 +81,31 @@ export async function DELETE(
     const media = await prisma.media.findUnique({ where: { id } });
 
     if (!media) {
-      return NextResponse.json({ error: 'Media not found' }, { status: 404 });
+      return NextResponse.json({ error: 'Media tidak ditemukan' }, { status: 404 });
     }
 
+    // Delete physical file from disk
+    try {
+      // Construct the full filesystem path using the uploads directory and filename
+      const uploadDir = path.join(process.cwd(), 'public', 'uploads');
+      const filePath = path.join(uploadDir, media.filename);
+      
+      // Check if file exists before attempting to delete
+      try {
+        await fs.access(filePath);
+        await fs.unlink(filePath);
+      } catch (accessError) {
+        console.warn('Physical file not found, proceeding with database deletion:', accessError);
+      }
+    } catch (fileError) {
+      console.error('Error deleting physical file:', fileError);
+      // Continue with database deletion even if file deletion fails
+    }
+
+    // Delete from database
     await prisma.media.delete({ where: { id } });
 
-    return NextResponse.json({ message: 'Media deleted successfully' });
+    return NextResponse.json({ message: 'Media berhasil dihapus' });
   } catch (error) {
     console.error('Error deleting media:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
@@ -114,7 +135,7 @@ export async function PATCH(
       },
     });
 
-    if (!user || !user.role || user.role.name !== 'ADMIN') {
+    if (!user || !user.role || (user.role.name !== 'ADMIN' && user.role.name !== 'SUPER_ADMIN')) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 

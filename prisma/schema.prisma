@@ -21,6 +21,7 @@ model User {
   news          News[]
   sessions      Session[]
   farmers       Farmer[]
+  fileStorages  FileStorage[]
   role          Role?     @relation(fields: [roleId], references: [id])
 
   @@index([roleId], map: "users_roleId_fkey")
@@ -266,4 +267,24 @@ model ContactSubmission {
   updatedAt DateTime @updatedAt
 
   @@map("contact_submissions")
+}
+
+model FileStorage {
+  id           String   @id @default(cuid())
+  filename     String
+  originalName String
+  mimeType     String
+  size         Int      // File size in bytes
+  path         String   // Storage path on server
+  url          String   // Public URL for access
+  category     String?  // Optional category for organization
+  description  String?
+  uploadedById String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  uploadedBy User? @relation(fields: [uploadedById], references: [id], onDelete: Cascade)
+
+  @@index([uploadedById], map: "file_storage_uploadedById_fkey")
+  @@map("file_storage")
 }

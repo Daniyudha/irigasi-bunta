@@ -140,7 +140,7 @@ export default function GalleryPage() {
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-gray-800 mb-4">Galeri</h1>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Jelajahi koleksi foto kami yang menampilkan kegiatan irigasi, infrastruktur, dan acara komunitas.
+            Jelajahi koleksi foto kami yang menampilkan kegiatan irigasi, infrastruktur, dan acara lainnya.
           </p>
         </div>
 

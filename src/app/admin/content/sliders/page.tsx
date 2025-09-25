@@ -28,7 +28,8 @@ export default function SlidersManagementPage() {
   useEffect(() => {
     if (status === 'loading') return;
 
-    if (!session || session.user.role !== 'ADMIN') {
+    // Check if user is authenticated and has admin or super admin role
+    if (!session || !session.user || (session.user.role !== 'ADMIN' && session.user.role !== 'SUPER_ADMIN')) {
       router.push('/login');
       return;
     }
@@ -53,7 +54,7 @@ export default function SlidersManagementPage() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this slider?')) return;
+    if (!confirm('Apakah Anda yakin ingin menghapus slider ini?')) return;
 
     try {
       const response = await fetch(`/api/admin/sliders/${id}`, {
@@ -104,12 +105,12 @@ export default function SlidersManagementPage() {
   return (
     <div className="container mx-auto">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold text-gray-800">Sliders Management</h1>
+        <h1 className="text-3xl font-bold text-gray-800">Kelola Slider</h1>
         <Link
           href="/admin/content/sliders/create"
           className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
         >
-          Add New Slider
+          Tambah Slider Baru
         </Link>
       </div>
 
@@ -124,25 +125,25 @@ export default function SlidersManagementPage() {
           <thead className="bg-gray-50">
             <tr>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Image
+                Gambar
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Title
+                Judul
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Subtitle
+                Sub Judul
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Link
+                URL
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Order
+                Urutan
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Status
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Actions
+                Aksi
               </th>
             </tr>
           </thead>
@@ -160,7 +161,7 @@ export default function SlidersManagementPage() {
                   {slider.title}
                 </td>
                 <td className="px-6 py-4 text-sm text-gray-500">
-                  {slider.subtitle || 'No subtitle'}
+                  {slider.subtitle || 'Tidak ada subjudul'}
                 </td>
                 <td className="px-6 py-4 text-sm text-gray-500">
                   {slider.link ? (
@@ -170,10 +171,10 @@ export default function SlidersManagementPage() {
                       rel="noopener noreferrer"
                       className="text-blue-600 hover:text-blue-800"
                     >
-                      View Link
+                      Lihat URL
                     </a>
                   ) : (
-                    'No link'
+                    'Tidak ada tautan'
                   )}
                 </td>
                 <td className="px-6 py-4 text-sm text-gray-500">
@@ -188,7 +189,7 @@ export default function SlidersManagementPage() {
                         : 'bg-red-100 text-red-800'
                     }`}
                   >
-                    {slider.active ? 'Active' : 'Inactive'}
+                    {slider.active ? 'Aktif' : 'Nonaktif'}
                   </button>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
@@ -196,13 +197,13 @@ export default function SlidersManagementPage() {
                     href={`/admin/content/sliders/edit/${slider.id}`}
                     className="text-indigo-600 hover:text-indigo-900 mr-3"
                   >
-                    Edit
+                    Ubah
                   </Link>
                   <button
                     onClick={() => handleDelete(slider.id)}
-                    className="text-red-600 hover:text-red-900"
+                    className="text-red-600 hover:text-red-900 cursor-pointer"
                   >
-                    Delete
+                    Hapus
                   </button>
                 </td>
               </tr>
@@ -212,7 +213,7 @@ export default function SlidersManagementPage() {
 
         {sliders.length === 0 && !loading && (
           <div className="px-6 py-4 text-center text-gray-500">
-            No sliders found. Create your first slider to get started.
+            Tidak ada slider ditemukan. Buat slider pertama Anda untuk memulai.
           </div>
         )}
       </div>

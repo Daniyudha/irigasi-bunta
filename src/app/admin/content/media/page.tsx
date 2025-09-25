@@ -46,7 +46,7 @@ export default function MediaManagementPage() {
   useEffect(() => {
     if (status === 'loading') return;
 
-    if (!session || !session.user?.permissions?.includes('media:read')) {
+    if (!session || !session.user || (session.user.role !== 'ADMIN' && session.user.role !== 'SUPER_ADMIN')) {
       router.push('/login');
       return;
     }
@@ -65,13 +65,13 @@ export default function MediaManagementPage() {
 
       const response = await fetch(`/api/admin/media?${params}`);
       if (!response.ok) {
-        throw new Error('Failed to fetch media');
+        throw new Error('Gagal memuat media');
       }
       const data = await response.json();
       setMedia(data.media);
       setPagination(data.pagination);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred');
+      setError(err instanceof Error ? err.message : 'Terjadi kesalahan');
     } finally {
       setLoading(false);
     }
@@ -84,7 +84,7 @@ export default function MediaManagementPage() {
   };
 
   const handleDelete = async (id: string, filename: string) => {
-    if (!confirm(`Are you sure you want to delete "${filename}"?`)) return;
+    if (!confirm(`Apakah Anda yakin ingin menghapus "${filename}"?`)) return;
 
     try {
       const response = await fetch(`/api/admin/media/${id}`, {
@@ -92,13 +92,13 @@ export default function MediaManagementPage() {
       });
 
       if (!response.ok) {
-        throw new Error('Failed to delete media');
+        throw new Error('Gagal menghapus media');
       }
 
       setMedia(media.filter(item => item.id !== id));
       setPagination(prev => ({ ...prev, totalCount: prev.totalCount - 1 }));
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to delete media');
+      setError(err instanceof Error ? err.message : 'Gagal menghapus media');
     }
   };
 
@@ -131,7 +131,7 @@ export default function MediaManagementPage() {
   return (
     <div className="container mx-auto">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold text-gray-800">Media Library</h1>
+        <h1 className="text-3xl font-bold text-gray-800">Pustaka Media</h1>
       </div>
 
       {error && (
@@ -145,7 +145,7 @@ export default function MediaManagementPage() {
         <div className="flex gap-2">
           <input
             type="text"
-            placeholder="Search media files..."
+            placeholder="Cari file media..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="flex-1 px-4 py-2 text-black border bg-white border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -154,7 +154,7 @@ export default function MediaManagementPage() {
             type="submit"
             className="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition-colors"
           >
-            Search
+            Cari
           </button>
           <button
             type="button"
@@ -165,7 +165,7 @@ export default function MediaManagementPage() {
             }}
             className="bg-gray-600 text-white px-6 py-2 rounded-md hover:bg-gray-700 transition-colors"
           >
-            Clear
+            Hapus
           </button>
         </div>
       </form>
@@ -174,8 +174,8 @@ export default function MediaManagementPage() {
       <div className="bg-white shadow-md rounded-lg overflow-hidden">
         {media.length === 0 && !loading ? (
           <div className="px-6 py-12 text-center text-gray-500">
-            <p className="text-lg mb-2">No media files found</p>
-            <p className="text-sm">Upload your first media file to get started</p>
+            <p className="text-lg mb-2">Tidak ada file media ditemukan</p>
+            <p className="text-sm">Unggah file media pertama Anda untuk memulai</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 p-6">
@@ -204,7 +204,7 @@ export default function MediaManagementPage() {
                     {formatFileSize(item.size)} • {item.mimeType}
                   </p>
                   <p className="text-xs text-gray-500 mb-3">
-                    Uploaded: {formatDate(item.createdAt)}
+                    Diunggah: {formatDate(item.createdAt)}
                   </p>
                   {item.altText && (
                     <p className="text-xs text-gray-600 mb-2">
@@ -213,7 +213,7 @@ export default function MediaManagementPage() {
                   )}
                   {item.caption && (
                     <p className="text-xs text-gray-600 mb-3">
-                      Caption: {item.caption}
+                      Keterangan: {item.caption}
                     </p>
                   )}
                   <div className="flex gap-2">
@@ -223,13 +223,13 @@ export default function MediaManagementPage() {
                       rel="noopener noreferrer"
                       className="flex-1 bg-blue-600 text-white text-xs py-1 px-2 rounded text-center hover:bg-blue-700 transition-colors"
                     >
-                      View
+                      Lihat
                     </a>
                     <button
                       onClick={() => handleDelete(item.id, item.originalName)}
-                      className="bg-red-600 text-white text-xs py-1 px-2 rounded hover:bg-red-700 transition-colors"
+                      className="bg-red-600 text-white text-xs py-1 px-2 rounded hover:bg-red-700 transition-colors cursor-pointer"
                     >
-                      Delete
+                      Hapus
                     </button>
                   </div>
                 </div>
@@ -243,9 +243,9 @@ export default function MediaManagementPage() {
           <div className="px-6 py-4 border-t border-gray-200">
             <div className="flex items-center justify-between">
               <div className="text-sm text-gray-700">
-                Showing {((pagination.page - 1) * pagination.limit) + 1} to{' '}
-                {Math.min(pagination.page * pagination.limit, pagination.totalCount)} of{' '}
-                {pagination.totalCount} results
+                Menampilkan {((pagination.page - 1) * pagination.limit) + 1} sampai{' '}
+                {Math.min(pagination.page * pagination.limit, pagination.totalCount)} dari{' '}
+                {pagination.totalCount} hasil
               </div>
               <div className="flex gap-2">
                 <button
@@ -253,14 +253,14 @@ export default function MediaManagementPage() {
                   disabled={!pagination.hasPrev}
                   className="px-3 py-1 border border-gray-300 rounded-md text-sm disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
                 >
-                  Previous
+                  Sebelumnya
                 </button>
                 <button
                   onClick={() => setPagination(prev => ({ ...prev, page: prev.page + 1 }))}
                   disabled={!pagination.hasNext}
                   className="px-3 py-1 border border-gray-300 rounded-md text-sm disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
                 >
-                  Next
+                  Berikutnya
                 </button>
               </div>
             </div>

@@ -40,6 +40,11 @@ if [ -f "scripts/check-data.js" ]; then
     node scripts/check-data.js
 fi
 
+if [ -f "scripts/check-permissions-simple.js" ]; then
+    echo "🔍 Step 5d: Checking permissions count..."
+    node scripts/check-permissions-simple.js
+fi
+
 # Step 6: Build the application
 echo "🏗️ Step 6: Building application..."
 npm run build

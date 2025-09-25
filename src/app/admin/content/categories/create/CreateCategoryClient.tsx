@@ -81,8 +81,8 @@ export default function CreateCategoryClient() {
     <div className="min-h-screen py-8">
       <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-800">Create Category</h1>
-          <p className="text-gray-600 mt-2">Add a new category for news articles</p>
+          <h1 className="text-3xl font-bold text-gray-800">Buat Kategori Baru</h1>
+          <p className="text-gray-600 mt-2">Tambahkan kategori baru untuk artikel berita</p>
         </div>
 
         {error && (
@@ -95,7 +95,7 @@ export default function CreateCategoryClient() {
           <div className="grid grid-cols-1 gap-6">
             <div>
               <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
-                Name *
+                Nama *
               </label>
               <input
                 type="text"
@@ -105,7 +105,7 @@ export default function CreateCategoryClient() {
                 onChange={handleNameChange}
                 required
                 className="w-full px-3 py-2 border text-black border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Enter category name"
+                placeholder="Masukkan nama kategori"
               />
             </div>
 
@@ -121,13 +121,13 @@ export default function CreateCategoryClient() {
                 onChange={handleInputChange}
                 required
                 className="w-full px-3 py-2 border text-black border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="category-slug"
+                placeholder="slug-kategori"
               />
             </div>
 
             <div>
               <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-2">
-                Description
+                Deskripsi
               </label>
               <textarea
                 id="description"
@@ -136,7 +136,7 @@ export default function CreateCategoryClient() {
                 onChange={handleInputChange}
                 rows={3}
                 className="w-full px-3 py-2 border text-black border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Brief description of the category"
+                placeholder="Deskripsi singkat tentang kategori"
               />
             </div>
           </div>
@@ -147,14 +147,14 @@ export default function CreateCategoryClient() {
               onClick={() => router.back()}
               className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
             >
-              Cancel
+              Batal
             </button>
             <button
               type="submit"
               disabled={loading}
               className="px-4 py-2 bg-blue-600 text-white rounded-md text-sm font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {loading ? 'Creating...' : 'Create Category'}
+              {loading ? 'Membuat...' : 'Buat Kategori'}
             </button>
           </div>
         </form>

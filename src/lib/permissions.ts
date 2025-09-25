@@ -30,6 +30,12 @@ export const permissionMap = {
   'media:edit': ['/admin/content/media'],
   'media:delete': ['/admin/content/media'],
 
+  // Storage Management
+  'storage:read': ['/admin/storage'],
+  'storage:upload': ['/admin/storage'],
+  'storage:edit': ['/admin/storage'],
+  'storage:delete': ['/admin/storage'],
+
   // Data Management
   'data:read': ['/admin/data/management', '/admin/data/historical', '/admin/data/validation'],
   'data:create': ['/admin/data/management'],
@@ -72,7 +78,10 @@ export const permissionMap = {
 
   // Reports
   'reports:view': ['/admin/reports'],
-  'reports:generate': ['/admin/reports']
+  'reports:generate': ['/admin/reports'],
+
+  // Storage Management
+  'storage:manage': ['/admin/storage']
 };
 
 // Function to check if user has access to a route
@@ -117,13 +126,19 @@ export const getAccessibleNavigation = (userPermissions: string[]) => {
         { name: 'Data Irigasi', href: '/admin/data/management', icon: 'Database' },
         { name: 'Histori Data', href: '/admin/data/historical', icon: 'History' },
         { name: 'Validasi Data', href: '/admin/data/validation', icon: 'BadgeCheck' },
-        { name: 'Kelompok Tani', href: '/admin/farmer-groups', icon: 'Users' }
+        { name: 'Kelompok Tani', href: '/admin/farmer-groups', icon: 'Users' },
       ].filter(item => hasAccessToRoute(userPermissions, item.href))
     },
     {
       title: 'SUBMISSIONS',
       items: [
         { name: 'Pesan Masuk', href: '/admin/contact-submissions', icon: 'MessageCircle' }
+      ].filter(item => hasAccessToRoute(userPermissions, item.href))
+    },
+    {
+      title: 'STORAGE',
+      items: [
+        { name: 'Arsip Data', href: '/admin/storage', icon: 'Archive' }
       ].filter(item => hasAccessToRoute(userPermissions, item.href))
     },
     {

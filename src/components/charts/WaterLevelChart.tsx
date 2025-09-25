@@ -19,14 +19,25 @@ export default function WaterLevelChart({ data }: WaterLevelChartProps) {
     );
   }
 
-  // Group data by area for the chart
-  const chartData = data.map(item => ({
-    date: item.date,
-    [item.area]: item.level,
-  }));
+  // Get all unique areas from the data
+  const areas = [...new Set(data.map(item => item.area))];
+  
+  // Group data by date for the chart - create an object for each date with values for each area
+  const dateGroups = data.reduce((acc, item) => {
+    if (!acc[item.date]) {
+      acc[item.date] = { date: item.date };
+    }
+    acc[item.date][item.area] = item.level;
+    return acc;
+  }, {} as Record<string, any>);
+
+  const chartData = Object.values(dateGroups);
+
+  // Colors for different areas
+  const colors = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'];
 
   return (
-    <div className="w-full h-80">
+    <div className="w-full h-80 mb-10">
       <h3 className="text-lg font-semibold text-black mb-4 text-center">Tren Ketinggian Air (meter)</h3>
       <ResponsiveContainer width="100%" height="100%">
         <LineChart
@@ -43,7 +54,16 @@ export default function WaterLevelChart({ data }: WaterLevelChartProps) {
           <YAxis />
           <Tooltip />
           <Legend />
-          <Line type="monotone" dataKey="Bunta" stroke="#3b82f6" strokeWidth={2} activeDot={{ r: 8 }} />
+          {areas.map((area, index) => (
+            <Line
+              key={area}
+              type="monotone"
+              dataKey={area}
+              stroke={colors[index % colors.length]}
+              strokeWidth={2}
+              activeDot={{ r: 8 }}
+            />
+          ))}
         </LineChart>
       </ResponsiveContainer>
     </div>

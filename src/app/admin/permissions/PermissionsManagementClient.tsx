@@ -15,13 +15,13 @@ export default function PermissionsManagementClient() {
         const response = await fetch('/api/admin/permissions');
         
         if (!response.ok) {
-          throw new Error('Failed to fetch permissions');
+          throw new Error('Gagal mengambil data izin');
         }
         
         const data = await response.json();
         setPermissions(data);
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'An error occurred');
+        setError(err instanceof Error ? err.message : 'Terjadi kesalahan');
       } finally {
         setLoading(false);
       }
@@ -58,7 +58,7 @@ export default function PermissionsManagementClient() {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold text-gray-900 mb-6">Permissions Management</h1>
+      <h1 className="text-3xl font-bold text-gray-900 mb-6">Manajemen Izin</h1>
 
       <div className="bg-white shadow-md rounded-lg overflow-hidden">
         {Object.entries(groupedPermissions).map(([category, categoryPermissions]) => (
@@ -74,7 +74,7 @@ export default function PermissionsManagementClient() {
                       {permission.name}
                     </h3>
                     <p className="text-xs text-gray-500">
-                      {permission.description || 'No description available'}
+                      {permission.description || 'Tidak ada deskripsi tersedia'}
                     </p>
                     <div className="mt-2 text-xs text-gray-400">
                       ID: {permission.id}
@@ -88,8 +88,8 @@ export default function PermissionsManagementClient() {
       </div>
 
       <div className="mt-6 text-sm text-gray-500">
-        <p>Total permissions: {permissions.length}</p>
-        <p>Permissions are managed automatically through the system and cannot be modified via the UI.</p>
+        <p>Total izin: {permissions.length}</p>
+        <p>Izin dikelola secara otomatis oleh sistem dan tidak dapat dimodifikasi melalui antarmuka.</p>
       </div>
     </div>
   );

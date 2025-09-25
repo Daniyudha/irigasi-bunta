@@ -52,7 +52,6 @@ export async function middleware(request: NextRequest) {
 
   console.log('Pathname:', pathname);
   console.log('Is public route:', isPublicRoute);
-  console.log('Public routes:', publicRoutes);
 
   if (isPublicRoute) {
     console.log('Allowing access to public route:', pathname);
@@ -88,6 +87,7 @@ export async function middleware(request: NextRequest) {
     console.log('Middleware processing for path:', pathname);
     console.log('Token email:', token.email);
     console.log('Token sub:', token.sub);
+    console.log('Token role:', token.role);
     console.log('Token data:', JSON.stringify(token, null, 2));
     
     // Use token data instead of querying database (Prisma doesn't work in edge runtime)
@@ -100,19 +100,19 @@ export async function middleware(request: NextRequest) {
       return NextResponse.redirect(loginUrl);
     }
 
-    // For admin UI routes, check if user has permission to view dashboard
+    // For admin UI routes, check if user has admin or super admin role
     if (isAdminRoute && !pathname.startsWith('/api/')) {
-      // Get user permissions from token (added in JWT callback)
-      const userPermissions = token.permissions as string[] || [];
+      console.log('Checking admin UI route access for role:', userRole);
       
-      // Check if user has dashboard:view permission
-      const hasDashboardPermission = userPermissions.includes('dashboard:view');
-      
-      if (!hasDashboardPermission) {
+      // Allow access for ADMIN and SUPER_ADMIN roles without specific permission check
+      if (userRole !== 'ADMIN' && userRole !== 'SUPER_ADMIN') {
+        console.log('Access denied for role:', userRole);
         const loginUrl = new URL('/login', request.url);
         loginUrl.searchParams.set('error', 'Access denied');
         return NextResponse.redirect(loginUrl);
       }
+      
+      console.log('Access granted for role:', userRole);
     }
 
     // Add user info to request headers for API routes
