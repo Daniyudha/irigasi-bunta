@@ -20,13 +20,17 @@ npx prisma generate
 echo "🗄️ Step 3: Running database migrations..."
 npx prisma migrate deploy
 
-# Step 4: Seed the database (all-in-one)
-echo "🌱 Step 4: Seeding database with comprehensive data..."
+# Step 4: Fix upload directories
+echo "📁 Step 4: Setting up upload directories..."
+node scripts/fix-upload-directories.js
+
+# Step 5: Seed the database (all-in-one)
+echo "🌱 Step 5: Seeding database with comprehensive data..."
 npm run seed
 
-# Step 5: Optional data verification
+# Step 6: Optional data verification
 if [ -f "scripts/check-data.js" ]; then
-    echo "🔍 Step 5: Running data consistency check..."
+    echo "🔍 Step 6: Running data consistency check..."
     node scripts/check-data.js
 fi
 

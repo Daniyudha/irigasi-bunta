@@ -92,7 +92,7 @@ export async function DELETE(
       });
 
       const isAdmin = user?.role?.permissions.some(
-        (rp) => rp.permission.name === 'manage_storage'
+        (rp) => rp.permission.name === 'storage:manage'
       );
 
       if (!isAdmin) {

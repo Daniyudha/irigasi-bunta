@@ -29,7 +29,12 @@ npx prisma generate
 npx prisma migrate deploy
 ```
 
-### 4. Seed the Database (All-in-One)
+### 4. Fix Upload Directories
+```bash
+node scripts/fix-upload-directories.js
+```
+
+### 5. Seed the Database (All-in-One)
 ```bash
 npm run seed
 ```
@@ -41,7 +46,7 @@ This single command now seeds:
 - Admin user (admin@buntabella.go.id / admin123)
 - Default categories
 
-### 5. Optional: Verify Data (if needed)
+### 6. Optional: Verify Data (if needed)
 ```bash
 # Check data consistency
 node scripts/check-data.js
