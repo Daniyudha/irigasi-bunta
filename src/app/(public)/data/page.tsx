@@ -50,68 +50,68 @@ export default function DataPage() {
   const [error, setError] = useState('');
 
   useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      setError('');
+
+      try {
+        if (activeTab === 'water') {
+          const response = await fetch('/api/data/water-level');
+          if (response.ok) {
+            const data: DbWaterLevelData[] = await response.json();
+            console.log('Raw water level data from API:', data);
+            // Transform database data to chart format - use actual locations
+            const transformedData: ChartWaterLevelData[] = data.map(item => ({
+              date: item.measuredAt?.split('T')[0] || new Date().toISOString().split('T')[0],
+              level: Number(item.value) || 0,
+              area: item.location || 'Lokasi Tidak Diketahui'
+            }));
+            console.log('Water level transformed data:', transformedData);
+            setChartWaterData(transformedData);
+          } else {
+            setError('Gagal mengambil data level air');
+          }
+        } else if (activeTab === 'rainfall') {
+          const response = await fetch('/api/data/rainfall');
+          if (response.ok) {
+            const data: DbRainfallData[] = await response.json();
+            // Transform database data to chart format - use actual locations
+            const transformedData: ChartRainfallData[] = data.map(item => ({
+              date: item.measuredAt?.split('T')[0] || new Date().toISOString().split('T')[0],
+              rainfall: Number(item.value) || 0,
+              area: item.location || 'Lokasi Tidak Diketahui'
+            }));
+            console.log('Rainfall transformed data:', transformedData);
+            setChartRainfallData(transformedData);
+          } else {
+            setError('Gagal mengambil data curah hujan');
+          }
+        } else if (activeTab === 'crops') {
+          const response = await fetch('/api/data/crops');
+          if (response.ok) {
+            const data: DbCropData[] = await response.json();
+            setCropData(data);
+          } else {
+            setError('Gagal mengambil data tanaman');
+          }
+        } else if (activeTab === 'farmers') {
+          const response = await fetch('/api/data/farmers');
+          if (response.ok) {
+            const data: DbFarmerData[] = await response.json();
+            setFarmerData(data);
+          } else {
+            setError('Gagal mengambil data petani');
+          }
+        }
+      } catch {
+        setError('Error mengambil data');
+      } finally {
+        setLoading(false);
+      }
+    };
+
     fetchData();
   }, [activeTab]);
-
-  const fetchData = async () => {
-    setLoading(true);
-    setError('');
-
-    try {
-      if (activeTab === 'water') {
-        const response = await fetch('/api/data/water-level');
-        if (response.ok) {
-          const data: DbWaterLevelData[] = await response.json();
-          console.log('Raw water level data from API:', data);
-          // Transform database data to chart format - use actual locations
-          const transformedData: ChartWaterLevelData[] = data.map(item => ({
-            date: item.measuredAt?.split('T')[0] || new Date().toISOString().split('T')[0],
-            level: Number(item.value) || 0,
-            area: item.location || 'Lokasi Tidak Diketahui'
-          }));
-          console.log('Water level transformed data:', transformedData);
-          setChartWaterData(transformedData);
-        } else {
-          setError('Gagal mengambil data level air');
-        }
-      } else if (activeTab === 'rainfall') {
-        const response = await fetch('/api/data/rainfall');
-        if (response.ok) {
-          const data: DbRainfallData[] = await response.json();
-          // Transform database data to chart format - use actual locations
-          const transformedData: ChartRainfallData[] = data.map(item => ({
-            date: item.measuredAt?.split('T')[0] || new Date().toISOString().split('T')[0],
-            rainfall: Number(item.value) || 0,
-            area: item.location || 'Lokasi Tidak Diketahui'
-          }));
-          console.log('Rainfall transformed data:', transformedData);
-          setChartRainfallData(transformedData);
-        } else {
-          setError('Gagal mengambil data curah hujan');
-        }
-      } else if (activeTab === 'crops') {
-        const response = await fetch('/api/data/crops');
-        if (response.ok) {
-          const data: DbCropData[] = await response.json();
-          setCropData(data);
-        } else {
-          setError('Gagal mengambil data tanaman');
-        }
-      } else if (activeTab === 'farmers') {
-        const response = await fetch('/api/data/farmers');
-        if (response.ok) {
-          const data: DbFarmerData[] = await response.json();
-          setFarmerData(data);
-        } else {
-          setError('Gagal mengambil data petani');
-        }
-      }
-    } catch (err) {
-      setError('Error mengambil data');
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const tabs = [
     { id: 'water', label: 'Level Air', icon: '💧' },

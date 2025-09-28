@@ -11,7 +11,7 @@ interface Category {
 }
 
 export default function CreateNewsClient() {
-  const { data: session, status } = useSession();
+  const { status } = useSession();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -50,8 +50,8 @@ export default function CreateNewsClient() {
         // The API returns { data: categories[], pagination: {...} }
         setCategories(data.data || []);
       }
-    } catch (err) {
-      console.error('Error fetching categories:', err);
+    } catch (error) {
+      console.error('Error fetching categories:', error);
       setCategories([]);
     }
   };
@@ -90,14 +90,15 @@ export default function CreateNewsClient() {
     const formData = new FormData();
     formData.append('file', file);
     
-    const response = await fetch('/api/admin/media', {
+    const response = await fetch('/api/admin/news/upload', {
       method: 'POST',
       body: formData,
       credentials: 'include', // Ensure cookies are sent for authentication
     });
 
     if (!response.ok) {
-      throw new Error('Failed to upload image');
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'Failed to upload image');
     }
 
     const data = await response.json();
@@ -150,7 +151,7 @@ export default function CreateNewsClient() {
         const errorData = await response.json();
         setError(errorData.message || 'Failed to create news article');
       }
-    } catch (err) {
+    } catch (error) {
       setError('Error creating news article');
     } finally {
       setLoading(false);

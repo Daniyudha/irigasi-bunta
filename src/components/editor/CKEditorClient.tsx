@@ -162,6 +162,25 @@ const CKEditorClient: React.FC<CKEditorClientProps> = ({
         'redo',
       ],
     },
+    // Remove text limits for articles
+    wordCount: {
+      onUpdate: (stats: { words: number; characters: number }) => {
+        console.log('Word count:', stats.words, 'Character count:', stats.characters);
+      },
+    },
+    // Disable any content filtering that might limit text
+    allowedContent: true,
+    // Increase maximum content size
+    htmlSupport: {
+      allow: [
+        {
+          name: /.*/,
+          attributes: true,
+          classes: true,
+          styles: true
+        }
+      ]
+    }
   };
 
   return (

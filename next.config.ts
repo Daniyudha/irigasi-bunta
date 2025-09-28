@@ -2,18 +2,23 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   /* config options here */
-  api: {
-    bodyParser: {
-      sizeLimit: '10mb'
-    },
-    responseLimit: '10mb'
-  },
-  experimental: {
-    serverComponentsExternalPackages: ['@prisma/client', 'bcryptjs']
-  },
+  serverExternalPackages: ["@prisma/client", "bcryptjs"], // ✅ pindah ke root, bukan experimental
   images: {
-    domains: ['irigasibunta.com', 'localhost'],
-    formats: ['image/webp', 'image/avif'],
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "irigasibunta.com",
+      },
+      {
+        protocol: "http",
+        hostname: "localhost",
+      },
+      {
+        protocol: "http",
+        hostname: "192.168.1.106",
+      },
+    ],
+    formats: ["image/webp", "image/avif"],
   },
 };
 

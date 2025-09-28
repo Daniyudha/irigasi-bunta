@@ -95,6 +95,15 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Check file size limit (10MB)
+    const maxSize = 10 * 1024 * 1024; // 10MB in bytes
+    if (file.size > maxSize) {
+      return NextResponse.json(
+        { error: 'File size too large. Maximum allowed size is 10MB.' },
+        { status: 400 }
+      );
+    }
+
     // Generate unique filename
     const timestamp = Date.now();
     const originalName = file.name;

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -16,11 +16,10 @@ interface Category {
 }
 
 export default function CategoriesManagementClient() {
-  const { data: session, status } = useSession();
+  const { status } = useSession();
   const router = useRouter();
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
-  const [tableLoading, setTableLoading] = useState(false);
   const [error, setError] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [debouncedSearchQuery, setDebouncedSearchQuery] = useState('');
@@ -53,9 +52,8 @@ export default function CategoriesManagementClient() {
     }
   }, [debouncedSearchQuery, currentPage, status]);
 
-  const fetchCategories = async (page = currentPage, query = debouncedSearchQuery) => {
+  const fetchCategories = useCallback(async (page = currentPage, query = debouncedSearchQuery) => {
     try {
-      setTableLoading(true);
       setError('');
       const url = new URL('/api/admin/categories', window.location.origin);
       url.searchParams.append('page', page.toString());
@@ -71,21 +69,16 @@ export default function CategoriesManagementClient() {
         setTotalPages(data.pagination?.pages || 1);
         setTotalItems(data.pagination?.total || data.length || 0);
       } else {
-        try {
-          const errorData = await response.json();
-          setError(`Gagal mengambil data kategori: ${errorData.message || response.statusText}`);
-        } catch (parseError) {
-          setError(`Gagal mengambil data kategori: ${response.status} ${response.statusText}`);
-        }
+        const errorData = await response.json();
+        setError(`Gagal mengambil data kategori: ${errorData.message || response.statusText}`);
       }
-    } catch (err) {
-      console.error('Error fetching categories:', err);
-      setError(`Error mengambil data kategori: ${err instanceof Error ? err.message : 'Unknown error'}`);
+    } catch (error) {
+      console.error('Error fetching categories:', error);
+      setError(`Error mengambil data kategori: ${error instanceof Error ? error.message : 'Unknown error'}`);
     } finally {
-      setTableLoading(false);
       setLoading(false);
     }
-  };
+  }, [currentPage, debouncedSearchQuery, itemsPerPage]);
 
   const handleDelete = async (id: string) => {
     if (!confirm('Apakah Anda yakin ingin menghapus kategori ini?')) {
@@ -104,7 +97,7 @@ export default function CategoriesManagementClient() {
         const errorData = await response.json();
         alert(errorData.message || 'Gagal menghapus kategori');
       }
-    } catch (err) {
+    } catch (error) {
       alert('Error menghapus kategori');
     }
   };

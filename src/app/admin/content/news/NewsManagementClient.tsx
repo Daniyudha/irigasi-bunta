@@ -22,11 +22,10 @@ interface News {
 }
 
 export default function NewsManagementClient() {
-  const { data: session, status } = useSession();
+  const { status } = useSession();
   const router = useRouter();
   const [news, setNews] = useState<News[]>([]);
   const [loading, setLoading] = useState(true);
-  const [tableLoading, setTableLoading] = useState(false);
   const [error, setError] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
@@ -41,33 +40,8 @@ export default function NewsManagementClient() {
     }
   }, [status, router]);
 
-  useEffect(() => {
-    if (status === 'authenticated') {
-      fetchNews();
-    }
-  }, [status]);
-
-  // Debounce search input
-  useEffect(() => {
-    const handler = setTimeout(() => {
-      setDebouncedSearchQuery(searchQuery);
-    }, 500); // 500ms debounce
-
-    return () => {
-      clearTimeout(handler);
-    };
-  }, [searchQuery]);
-
-  // Fetch news when debounced search query or page changes
-  useEffect(() => {
-    if (status === 'authenticated') {
-      fetchNews(currentPage, debouncedSearchQuery);
-    }
-  }, [debouncedSearchQuery, currentPage, status]);
-
   const fetchNews = useCallback(async (page = currentPage, query = debouncedSearchQuery) => {
     try {
-      setTableLoading(true);
       setError('');
       const url = new URL('/api/admin/news', window.location.origin);
       url.searchParams.append('page', page.toString());
@@ -86,13 +60,37 @@ export default function NewsManagementClient() {
         const errorData = await response.json().catch(() => ({}));
         setError(errorData.message || 'Failed to fetch news');
       }
-    } catch (err) {
+    } catch (error) {
       setError('Network error: Unable to fetch news');
     } finally {
-      setTableLoading(false);
       setLoading(false);
     }
   }, [currentPage, itemsPerPage, debouncedSearchQuery]);
+
+  useEffect(() => {
+    if (status === 'authenticated') {
+      fetchNews();
+    }
+  }, [status, fetchNews]);
+
+  // Debounce search input
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearchQuery(searchQuery);
+    }, 500); // 500ms debounce
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [searchQuery]);
+
+  // Fetch news when debounced search query or page changes
+  useEffect(() => {
+    if (status === 'authenticated') {
+      fetchNews(currentPage, debouncedSearchQuery);
+    }
+  }, [debouncedSearchQuery, currentPage, status, fetchNews]);
+
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value);
@@ -123,7 +121,7 @@ export default function NewsManagementClient() {
       } else {
         setError('Failed to delete news');
       }
-    } catch (err) {
+    } catch (error) {
       setError('Error deleting news');
     }
   };
@@ -143,7 +141,7 @@ export default function NewsManagementClient() {
       } else {
         setError('Failed to update news');
       }
-    } catch (err) {
+    } catch (error) {
       setError('Error updating news');
     }
   };

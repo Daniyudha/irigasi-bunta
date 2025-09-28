@@ -54,13 +54,6 @@ export default async function AdminContent() {
             </Link>
           </div>
 
-          <div className="bg-white p-6 rounded-lg shadow-md">
-            <h3 className="text-xl font-semibold mb-4 text-red-600">Pustaka Media</h3>
-            <p className="text-gray-600 mb-4">Semua file media yang diunggah</p>
-            <Link href="/admin/content/media" className="block w-full bg-red-600 text-white py-2 px-4 rounded hover:bg-red-700 transition-colors text-center">
-              Lihat Media
-            </Link>
-          </div>
         </div>
       </div>
     </div>

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter, useParams } from 'next/navigation';
 
@@ -12,7 +12,7 @@ interface Category {
 }
 
 export default function EditCategoryClient() {
-  const { data: session, status } = useSession();
+  const { status } = useSession();
   const router = useRouter();
   const params = useParams();
   const [loading, setLoading] = useState(true);
@@ -32,13 +32,7 @@ export default function EditCategoryClient() {
     }
   }, [status, router]);
 
-  useEffect(() => {
-    if (status === 'authenticated' && params.id) {
-      fetchCategory();
-    }
-  }, [status, params.id]);
-
-  const fetchCategory = async () => {
+  const fetchCategory = useCallback(async () => {
     try {
       const response = await fetch(`/api/admin/categories/${params.id}`);
       if (response.ok) {
@@ -52,12 +46,19 @@ export default function EditCategoryClient() {
       } else {
         setError('Failed to fetch category');
       }
-    } catch (err) {
+    } catch (error) {
       setError('Error fetching category');
     } finally {
       setLoading(false);
     }
-  };
+  }, [params.id]);
+
+  useEffect(() => {
+    if (status === 'authenticated' && params.id) {
+      fetchCategory();
+    }
+  }, [status, params.id, fetchCategory]);
+
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -105,7 +106,7 @@ export default function EditCategoryClient() {
         const errorData = await response.json();
         setError(errorData.message || 'Failed to update category');
       }
-    } catch (err) {
+    } catch (error) {
       setError('Error updating category');
     } finally {
       setSaving(false);

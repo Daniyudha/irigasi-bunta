@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
+import { unlink } from 'fs/promises';
+import { join } from 'path';
 
 export async function GET(
   request: NextRequest,
@@ -103,27 +105,36 @@ export async function PUT(
 
       // If a new file is provided, upload it
       if (file && file.size > 0) {
-        const mediaFormData = new FormData();
-        mediaFormData.append('file', file);
+        // Check file size limit (10MB)
+        const maxSize = 10 * 1024 * 1024; // 10MB in bytes
+        if (file.size > maxSize) {
+          return NextResponse.json(
+            { message: 'File size too large. Maximum allowed size is 10MB.' },
+            { status: 400 }
+          );
+        }
 
-        const mediaResponse = await fetch(`${request.nextUrl.origin}/api/admin/media`, {
+        const uploadFormData = new FormData();
+        uploadFormData.append('file', file);
+
+        const uploadResponse = await fetch(`${request.nextUrl.origin}/api/admin/sliders/upload`, {
           method: 'POST',
-          body: mediaFormData,
+          body: uploadFormData,
           headers: {
             'cookie': request.headers.get('cookie') || '',
           },
         });
 
-        if (!mediaResponse.ok) {
-          const error = await mediaResponse.json();
+        if (!uploadResponse.ok) {
+          const error = await uploadResponse.json();
           return NextResponse.json(
-            { message: error.message || 'Failed to upload image' },
-            { status: mediaResponse.status }
+            { message: error.error || 'Failed to upload image' },
+            { status: uploadResponse.status }
           );
         }
 
-        const media = await mediaResponse.json();
-        imageUrl = media.url;
+        const uploadResult = await uploadResponse.json();
+        imageUrl = uploadResult.url;
       }
 
       // Update slider with new data
@@ -223,6 +234,30 @@ export async function DELETE(
     }
 
     const { id } = await context.params;
+
+    // Check if slider exists and get image URL
+    const existingSlider = await prisma.slider.findUnique({
+      where: { id },
+    });
+
+    if (!existingSlider) {
+      return NextResponse.json({ message: 'Slider not found' }, { status: 404 });
+    }
+
+    // Delete associated file if it exists
+    if (existingSlider.image && existingSlider.image.startsWith('/uploads/sliders/')) {
+      try {
+        const filename = existingSlider.image.split('/').pop();
+        if (filename) {
+          const filePath = join(process.cwd(), 'public', 'uploads', 'sliders', filename);
+          await unlink(filePath);
+          console.log('Deleted file:', filePath);
+        }
+      } catch (fileError) {
+        console.error('Error deleting file:', fileError);
+        // Continue with database deletion even if file deletion fails
+      }
+    }
 
     await prisma.slider.delete({
       where: { id },

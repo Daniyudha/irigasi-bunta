@@ -49,7 +49,7 @@ export default function GalleryPage() {
         } else {
           setError('Failed to fetch gallery items');
         }
-      } catch (err) {
+      } catch {
         setError('Error fetching gallery items');
       } finally {
         setLoading(false);

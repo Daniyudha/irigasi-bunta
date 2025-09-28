@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { galleryCategories } from '@/types/gallery';
 
 export default function CreateGalleryClient() {
-  const { data: session, status } = useSession();
+  const { status } = useSession();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -62,19 +62,20 @@ export default function CreateGalleryClient() {
         const formData = new FormData();
         formData.append('file', file);
 
-        const response = await fetch('/api/admin/media', {
+        const response = await fetch('/api/admin/gallery/upload', {
           method: 'POST',
           body: formData,
         });
 
         if (response.ok) {
-          const media = await response.json();
-          setImagePreview(media.url);
-          setFormData(prev => ({ ...prev, imageUrl: media.url }));
+          const uploadResult = await response.json();
+          setImagePreview(uploadResult.url);
+          setFormData(prev => ({ ...prev, imageUrl: uploadResult.url }));
         } else {
-          setError('Failed to upload image');
+          const errorData = await response.json();
+          setError(errorData.error || 'Failed to upload image');
         }
-      } catch (err) {
+      } catch (error) {
         setError('Error uploading image');
       } finally {
         setUploading(false);
@@ -108,7 +109,7 @@ export default function CreateGalleryClient() {
         const errorData = await response.json();
         setError(errorData.message || 'Failed to create gallery item');
       }
-    } catch (err) {
+    } catch (error) {
       setError('Error creating gallery item');
     } finally {
       setLoading(false);
@@ -127,8 +128,8 @@ export default function CreateGalleryClient() {
     <div className="min-h-screen py-8">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-800">Create Gallery Item</h1>
-          <p className="text-gray-600 mt-2">Add a new image or video to your gallery</p>
+          <h1 className="text-3xl font-bold text-gray-800">Buat Galeri Baru</h1>
+          <p className="text-gray-600 mt-2">tambahkan gambar atau video di galeri</p>
         </div>
 
         {error && (
@@ -141,7 +142,7 @@ export default function CreateGalleryClient() {
           <div className="grid grid-cols-1 gap-6">
             <div>
               <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-2">
-                Title *
+                Judul *
               </label>
               <input
                 type="text"
@@ -151,13 +152,13 @@ export default function CreateGalleryClient() {
                 onChange={handleInputChange}
                 required
                 className="w-full px-3 py-2 text-black border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Enter gallery item title"
+                placeholder="Masukkan judul galeri"
               />
             </div>
 
             <div>
               <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-2">
-                Description
+                Deskripsi
               </label>
               <textarea
                 id="description"
@@ -166,13 +167,13 @@ export default function CreateGalleryClient() {
                 onChange={handleInputChange}
                 rows={3}
                 className="w-full px-3 py-2 text-black border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Description of the gallery item"
+                placeholder="Deskripsi singkat tentang galeri"
               />
             </div>
 
             <div>
               <label htmlFor="type" className="block text-sm font-medium text-gray-700 mb-2">
-                Type *
+                Tipe *
               </label>
               <select
                 id="type"
@@ -226,7 +227,7 @@ export default function CreateGalleryClient() {
                   type="url"
                   id="imageUrl"
                   name="imageUrl"
-                  value={formData.imageUrl}
+                  value={formData.imageUrl || ''}
                   onChange={handleInputChange}
                   required={formData.type === 'video'}
                   className="w-full px-3 py-2 text-black border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"

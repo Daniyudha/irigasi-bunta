@@ -5,7 +5,7 @@ import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 
 export default function CreateCategoryClient() {
-  const { data: session, status } = useSession();
+  const { status } = useSession();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -62,7 +62,7 @@ export default function CreateCategoryClient() {
         const errorData = await response.json();
         setError(errorData.message || 'Failed to create category');
       }
-    } catch (err) {
+    } catch (error) {
       setError('Error creating category');
     } finally {
       setLoading(false);

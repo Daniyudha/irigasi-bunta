@@ -86,28 +86,37 @@ export async function POST(request: NextRequest) {
         );
       }
 
-      // Upload file to media endpoint
-      const mediaFormData = new FormData();
-      mediaFormData.append('file', file);
+      // Check file size limit (10MB)
+      const maxSize = 10 * 1024 * 1024; // 10MB in bytes
+      if (file.size > maxSize) {
+        return NextResponse.json(
+          { message: 'File size too large. Maximum allowed size is 10MB.' },
+          { status: 400 }
+        );
+      }
 
-      const mediaResponse = await fetch(`${request.nextUrl.origin}/api/admin/media`, {
+      // Upload file to slider upload endpoint
+      const uploadFormData = new FormData();
+      uploadFormData.append('file', file);
+
+      const uploadResponse = await fetch(`${request.nextUrl.origin}/api/admin/sliders/upload`, {
         method: 'POST',
-        body: mediaFormData,
+        body: uploadFormData,
         headers: {
           'cookie': request.headers.get('cookie') || '',
         },
       });
 
-      if (!mediaResponse.ok) {
-        const error = await mediaResponse.json();
+      if (!uploadResponse.ok) {
+        const error = await uploadResponse.json();
         return NextResponse.json(
-          { message: error.message || 'Failed to upload image' },
-          { status: mediaResponse.status }
+          { message: error.error || 'Failed to upload image' },
+          { status: uploadResponse.status }
         );
       }
 
-      const media = await mediaResponse.json();
-      const imageUrl = media.url;
+      const uploadResult = await uploadResponse.json();
+      const imageUrl = uploadResult.url;
 
       const slider = await prisma.slider.create({
         data: {

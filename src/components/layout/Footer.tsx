@@ -32,6 +32,7 @@ export default function Footer() {
                                 alt="Admin Avatar"
                                 width={250}
                                 height={40}
+                                className="w-auto h-auto"
                                 priority />
                         </div>
                         <p className="text-gray-300 mb-6 max-w-md">

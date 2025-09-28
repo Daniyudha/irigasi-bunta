@@ -22,7 +22,7 @@ export default function Header() {
 
     return (
         <header className="bg-white shadow-lg sticky top-0 z-50">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="max-w-7xl mx-auto py-2 px-4 sm:px-6 lg:px-8">
                 <div className="flex justify-between items-center h-16">
                     {/* Logo and Site Name */}
                     <div className="flex items-center">
@@ -32,15 +32,16 @@ export default function Header() {
                                 alt="Admin Avatar"
                                 width={250}
                                 height={40}
+                                className="w-auto h-auto"
                                 priority />
                         </Link>
                     </div>
 
                     {/* Desktop Navigation */}
-                    <nav className="hidden lg:flex space-x-8">
+                    <nav className="hidden lg:flex lg:space-x-5 xl:space-x-10">
                         {navigationItems.map((item) => {
                             const isActive = pathname === item.href ||
-                                           (item.href !== '/' && pathname.startsWith(item.href));
+                                (item.href !== '/' && pathname.startsWith(item.href));
                             return (
                                 <Link
                                     key={item.name}
@@ -75,7 +76,7 @@ export default function Header() {
                         <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-white border-t">
                             {navigationItems.map((item) => {
                                 const isActive = pathname === item.href ||
-                                               (item.href !== '/' && pathname.startsWith(item.href));
+                                    (item.href !== '/' && pathname.startsWith(item.href));
                                 return (
                                     <Link
                                         key={item.name}

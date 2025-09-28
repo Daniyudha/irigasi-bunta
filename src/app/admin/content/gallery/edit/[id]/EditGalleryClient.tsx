@@ -21,7 +21,7 @@ interface EditGalleryClientProps {
 }
 
 export default function EditGalleryClient({ id }: EditGalleryClientProps) {
-  const { data: session, status } = useSession();
+  const { status } = useSession();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(true);
@@ -74,7 +74,7 @@ export default function EditGalleryClient({ id }: EditGalleryClientProps) {
       } else {
         setError('Failed to fetch gallery item');
       }
-    } catch (err) {
+    } catch (error) {
       setError('Error fetching gallery item');
     } finally {
       setFetching(false);
@@ -106,19 +106,20 @@ export default function EditGalleryClient({ id }: EditGalleryClientProps) {
         const formData = new FormData();
         formData.append('file', file);
 
-        const response = await fetch('/api/admin/media', {
+        const response = await fetch('/api/admin/gallery/upload', {
           method: 'POST',
           body: formData,
         });
 
         if (response.ok) {
-          const media = await response.json();
-          setImagePreview(media.url);
-          setFormData(prev => ({ ...prev, imageUrl: media.url }));
+          const uploadResult = await response.json();
+          setImagePreview(uploadResult.url);
+          setFormData(prev => ({ ...prev, imageUrl: uploadResult.url }));
         } else {
-          setError('Failed to upload image');
+          const errorData = await response.json();
+          setError(errorData.error || 'Failed to upload image');
         }
-      } catch (err) {
+      } catch (error) {
         setError('Error uploading image');
       } finally {
         setUploading(false);
@@ -166,7 +167,7 @@ export default function EditGalleryClient({ id }: EditGalleryClientProps) {
         const errorData = await response.json();
         setError(errorData.message || 'Failed to update gallery item');
       }
-    } catch (err) {
+    } catch (error) {
       setError('Error updating gallery item');
     } finally {
       setLoading(false);
@@ -185,8 +186,8 @@ export default function EditGalleryClient({ id }: EditGalleryClientProps) {
     <div className="min-h-screen py-8">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-800">Edit Gallery Item</h1>
-          <p className="text-gray-600 mt-2">Update gallery item details</p>
+          <h1 className="text-3xl font-bold text-gray-800">Edit Gallery</h1>
+          <p className="text-gray-600 mt-2">Perbarui detail galeri</p>
         </div>
 
         {error && (
@@ -199,7 +200,7 @@ export default function EditGalleryClient({ id }: EditGalleryClientProps) {
           <div className="grid grid-cols-1 gap-6">
             <div>
               <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-2">
-                Title *
+                Judul *
               </label>
               <input
                 type="text"
@@ -208,14 +209,14 @@ export default function EditGalleryClient({ id }: EditGalleryClientProps) {
                 value={formData.title}
                 onChange={handleInputChange}
                 required
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Enter gallery item title"
+                className="w-full px-3 py-2 text-black border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Masukkan judul galeri"
               />
             </div>
 
             <div>
               <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-2">
-                Description
+                Deskripsi
               </label>
               <textarea
                 id="description"
@@ -223,9 +224,26 @@ export default function EditGalleryClient({ id }: EditGalleryClientProps) {
                 value={formData.description}
                 onChange={handleInputChange}
                 rows={3}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Description of the gallery item"
+                className="w-full px-3 py-2 text-black border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Deskripsi singkat tentang galeri"
               />
+            </div>
+
+            <div>
+              <label htmlFor="type" className="block text-sm font-medium text-gray-700 mb-2">
+                Tipe *
+              </label>
+              <select
+                id="type"
+                name="type"
+                value={formData.type}
+                onChange={handleInputChange}
+                required
+                className="w-full px-3 py-2 text-black border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="image">Image</option>
+                <option value="video">Video</option>
+              </select>
             </div>
 
             {/* Conditional rendering based on media type */}
@@ -240,7 +258,7 @@ export default function EditGalleryClient({ id }: EditGalleryClientProps) {
                   ref={fileInputRef}
                   accept="image/*"
                   onChange={handleImageUpload}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full file:px-3 file:py-2 file:cursor-pointer text-black file:bg-gray-300 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   required={formData.type === 'image'}
                   disabled={uploading}
                 />
@@ -267,10 +285,10 @@ export default function EditGalleryClient({ id }: EditGalleryClientProps) {
                   type="url"
                   id="imageUrl"
                   name="imageUrl"
-                  value={formData.imageUrl}
+                  value={formData.imageUrl || ''}
                   onChange={handleInputChange}
                   required={formData.type === 'video'}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 text-black border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder="https://www.youtube.com/watch?v=..."
                 />
                 {videoPreviewUrl && (
@@ -292,7 +310,7 @@ export default function EditGalleryClient({ id }: EditGalleryClientProps) {
 
             <div>
               <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-2">
-                Category *
+                Kategori *
               </label>
               <select
                 id="category"
@@ -300,7 +318,7 @@ export default function EditGalleryClient({ id }: EditGalleryClientProps) {
                 value={formData.category}
                 onChange={handleInputChange}
                 required
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border text-black border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="">Select a category</option>
                 {galleryCategories
@@ -310,23 +328,6 @@ export default function EditGalleryClient({ id }: EditGalleryClientProps) {
                       {category}
                     </option>
                   ))}
-              </select>
-            </div>
-
-            <div>
-              <label htmlFor="type" className="block text-sm font-medium text-gray-700 mb-2">
-                Type *
-              </label>
-              <select
-                id="type"
-                name="type"
-                value={formData.type}
-                onChange={handleInputChange}
-                required
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="image">Image</option>
-                <option value="video">Video</option>
               </select>
             </div>
 

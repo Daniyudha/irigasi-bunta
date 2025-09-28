@@ -31,7 +31,7 @@ export default function FarmersPublicClient() {
       } else {
         setError('Gagal mengambil data kelompok tani');
       }
-    } catch (err) {
+    } catch {
       setError('Error mengambil data kelompok tani');
     } finally {
       setLoading(false);

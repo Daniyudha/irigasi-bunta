@@ -25,10 +25,6 @@ export const permissionMap = {
   'sliders:edit': ['/admin/content/sliders'],
   'sliders:delete': ['/admin/content/sliders'],
   
-  'media:read': ['/admin/content/media'],
-  'media:upload': ['/admin/content/media'],
-  'media:edit': ['/admin/content/media'],
-  'media:delete': ['/admin/content/media'],
 
   // Storage Management
   'storage:read': ['/admin/storage'],
@@ -116,8 +112,7 @@ export const getAccessibleNavigation = (userPermissions: string[]) => {
         { name: 'Artikel Berita', href: '/admin/content/news', icon: 'Newspaper' },
         { name: 'Galeri', href: '/admin/content/gallery', icon: 'Images' },
         { name: 'Kategori', href: '/admin/content/categories', icon: 'Logs' },
-        { name: 'Slider/Spanduk', href: '/admin/content/sliders', icon: 'GalleryThumbnails' },
-        { name: 'Pustaka Media', href: '/admin/content/media', icon: 'BookOpenCheck' }
+        { name: 'Slider/Spanduk', href: '/admin/content/sliders', icon: 'GalleryThumbnails' }
       ].filter(item => hasAccessToRoute(userPermissions, item.href))
     },
     {

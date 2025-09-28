@@ -20,13 +20,12 @@ interface GalleryItem {
 }
 
 export default function GalleryManagementClient() {
-  const { data: session, status } = useSession();
+  const { status } = useSession();
   const router = useRouter();
   const [gallery, setGallery] = useState<GalleryItem[]>([]);
   const [filteredGallery, setFilteredGallery] = useState<GalleryItem[]>([]);
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [loading, setLoading] = useState(true);
-  const [tableLoading, setTableLoading] = useState(false);
   const [error, setError] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
@@ -54,16 +53,8 @@ export default function GalleryManagementClient() {
     };
   }, [searchQuery]);
 
-  // Fetch gallery when debounced search query, page, or category changes
-  useEffect(() => {
-    if (status === 'authenticated') {
-      fetchGallery(currentPage, debouncedSearchQuery, selectedCategory);
-    }
-  }, [debouncedSearchQuery, currentPage, status, selectedCategory]);
-
-  const fetchGallery = async (page = currentPage, query = debouncedSearchQuery, category = selectedCategory) => {
+  const fetchGallery = useCallback(async (page = currentPage, query = debouncedSearchQuery, category = selectedCategory) => {
     try {
-      setTableLoading(true);
       setError('');
       const url = new URL('/api/admin/gallery', window.location.origin);
       url.searchParams.append('page', page.toString());
@@ -90,14 +81,21 @@ export default function GalleryManagementClient() {
         setError(errorData.message || 'Gagal mengambil data item galeri');
         console.error('API error:', errorData);
       }
-    } catch (err) {
+    } catch (error) {
       setError('Error jaringan: Tidak dapat mengambil data item galeri');
-      console.error('Fetch error:', err);
+      console.error('Fetch error:', error);
     } finally {
-      setTableLoading(false);
       setLoading(false);
     }
-  };
+  }, [currentPage, debouncedSearchQuery, selectedCategory, itemsPerPage]);
+
+  // Fetch gallery when debounced search query, page, or category changes
+  useEffect(() => {
+    if (status === 'authenticated') {
+      fetchGallery(currentPage, debouncedSearchQuery, selectedCategory);
+    }
+  }, [debouncedSearchQuery, currentPage, status, selectedCategory, fetchGallery]);
+
 
   const handleDelete = async (id: string) => {
     if (!confirm('Apakah Anda yakin ingin menghapus item galeri ini?')) return;
@@ -108,12 +106,17 @@ export default function GalleryManagementClient() {
       });
 
       if (response.ok) {
-        setGallery(gallery.filter(item => item.id !== id));
+        // Update both gallery and filteredGallery states immediately
+        setGallery(prevGallery => prevGallery.filter(item => item.id !== id));
+        setFilteredGallery(prevFiltered => prevFiltered.filter(item => item.id !== id));
+        // Also update total items count
+        setTotalItems(prevTotal => prevTotal - 1);
       } else {
-        setError('Gagal menghapus item galeri');
+        const errorData = await response.json().catch(() => ({}));
+        setError(errorData.message || 'Gagal menghapus item galeri');
       }
-    } catch (err) {
-      setError('Error menghapus item galeri');
+    } catch (error) {
+      setError('Error jaringan: Tidak dapat menghapus item galeri');
     }
   };
 
@@ -132,7 +135,7 @@ export default function GalleryManagementClient() {
       } else {
         setError('Gagal memperbarui item galeri');
       }
-    } catch (err) {
+    } catch (error) {
       setError('Error memperbarui item galeri');
     }
   };

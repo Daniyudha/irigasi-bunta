@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
+import { unlink } from 'fs/promises';
+import { join } from 'path';
 
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -97,8 +99,16 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     return NextResponse.json(updatedNews);
   } catch (error) {
     console.error('Error updating news:', error);
+    // Log detailed error information
+    if (error instanceof Error) {
+      console.error('Error message:', error.message);
+      console.error('Error stack:', error.stack);
+    }
     return NextResponse.json(
-      { message: 'Internal server error' },
+      {
+        message: 'Internal server error',
+        details: error instanceof Error ? error.message : 'Unknown error'
+      },
       { status: 500 }
     );
   }
@@ -120,6 +130,21 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
 
     if (!existingNews) {
       return NextResponse.json({ message: 'News not found' }, { status: 404 });
+    }
+
+    // Delete associated file if it exists
+    if (existingNews.image && existingNews.image.startsWith('/uploads/news/')) {
+      try {
+        const filename = existingNews.image.split('/').pop();
+        if (filename) {
+          const filePath = join(process.cwd(), 'public', 'uploads', 'news', filename);
+          await unlink(filePath);
+          console.log('Deleted file:', filePath);
+        }
+      } catch (fileError) {
+        console.error('Error deleting file:', fileError);
+        // Continue with database deletion even if file deletion fails
+      }
     }
 
     await prisma.news.delete({

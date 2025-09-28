@@ -13,7 +13,7 @@ interface WaterLevelData {
 }
 
 export default function IrrigationPage() {
-  const [selectedArea, setSelectedArea] = useState<IrrigationArea | null>(null);
+  const [, setSelectedArea] = useState<IrrigationArea | null>(null);
   const [areasWithDynamicData, setAreasWithDynamicData] = useState<IrrigationArea[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -56,8 +56,8 @@ export default function IrrigationPage() {
       });
       
       setAreasWithDynamicData(updatedAreas);
-    } catch (err) {
-      setError('Error mengambil data level air: ' + (err instanceof Error ? err.message : 'Unknown error'));
+    } catch {
+      setError('Error mengambil data level air');
       // Fallback to static data if fetch fails
       setAreasWithDynamicData(irrigationAreas);
     } finally {

@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
+import { unlink } from 'fs/promises';
+import { join } from 'path';
 
 export async function GET(
   request: NextRequest,
@@ -98,6 +100,21 @@ export async function DELETE(
 
     if (!existingItem) {
       return NextResponse.json({ message: 'Gallery item not found' }, { status: 404 });
+    }
+
+    // Delete associated file if it exists
+    if (existingItem.imageUrl && existingItem.imageUrl.startsWith('/uploads/gallery/')) {
+      try {
+        const filename = existingItem.imageUrl.split('/').pop();
+        if (filename) {
+          const filePath = join(process.cwd(), 'public', 'uploads', 'gallery', filename);
+          await unlink(filePath);
+          console.log('Deleted file:', filePath);
+        }
+      } catch (fileError) {
+        console.error('Error deleting file:', fileError);
+        // Continue with database deletion even if file deletion fails
+      }
     }
 
     await prisma.gallery.delete({

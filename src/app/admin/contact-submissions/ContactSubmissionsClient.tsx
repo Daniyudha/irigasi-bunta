@@ -3,7 +3,6 @@
 import React, { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
 import SimpleModal from '@/components/ui/SimpleModal';
 
 interface ContactSubmission {
@@ -18,7 +17,7 @@ interface ContactSubmission {
 }
 
 export default function ContactSubmissionsClient() {
-  const { data: session, status } = useSession();
+  const { status } = useSession();
   const router = useRouter();
   const [submissions, setSubmissions] = useState<ContactSubmission[]>([]);
   const [loading, setLoading] = useState(true);
@@ -48,7 +47,7 @@ export default function ContactSubmissionsClient() {
       } else {
         setError('Failed to fetch contact submissions');
       }
-    } catch (err) {
+    } catch {
       setError('Error fetching contact submissions');
     } finally {
       setLoading(false);
@@ -73,7 +72,7 @@ export default function ContactSubmissionsClient() {
         const errorData = await response.json();
         setError(errorData.message || 'Failed to update status');
       }
-    } catch (err) {
+    } catch {
       setError('Error updating status');
     }
   };
